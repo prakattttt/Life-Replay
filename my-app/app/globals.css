@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+/* Enables class-based dark mode: toggle by adding/removing `.dark` on <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* ---------- Backgrounds ---------- */
+  --background: #faf9f6;
+  --background-secondary: #f3f1eb;
+  --background-section: #f7f5f0;
+
+  /* ---------- Surfaces ---------- */
+  --surface: #ffffff;
+  --surface-elevated: #fffefc;
+  --surface-subtle: #fdfcfa;
+
+  /* ---------- Teal (primary) ---------- */
+  --teal: #176b67;
+  --teal-dark: #12534f;
+  --teal-hover: #145e5a;
+  --teal-light: #dcefed;
+  --teal-subtle: #edf7f6;
+
+  /* ---------- Amber (accent) ---------- */
+  --amber: #d99a3d;
+  --amber-dark: #b87a26;
+  --amber-light: #fff1d6;
+  --amber-subtle: #fffaf0;
+
+  /* ---------- Terracotta ---------- */
+  --terracotta: #c9785d;
+  --terracotta-light: #f5e3dd;
+
+  /* ---------- Text ---------- */
+  --foreground: #242321;
+  --foreground-secondary: #6e6a63;
+  --foreground-muted: #98938a;
+  --foreground-disabled: #b8b3aa;
+
+  /* ---------- Borders ---------- */
+  --border: #e6e2d9;
+  --border-subtle: #eeeae2;
+  --border-strong: #d9d4ca;
+
+  /* ---------- Semantic ---------- */
+  --success: #4f8a68;
+  --error: #c95c5c;
+  --warning: var(--amber);
+
+  /* ---------- Category colors ---------- */
+  --category-work: var(--teal);
+  --category-food: var(--amber);
+  --category-music: var(--terracotta);
+  --category-fitness: #4f8a68;
+  --category-learning: #4c7ea8;
+  --category-ideas: #c9a227;
+  --category-personal: #c98b8b;
+  --category-travel: #2f8f89;
+  --category-other: #98938a;
+
+  /* ---------- Radius ---------- */
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
+
+  /* ---------- Shadow ---------- */
+  --shadow-subtle: 0 4px 20px rgba(30, 25, 20, 0.06);
+
+  /* ---------- Fonts ---------- */
+  --font-app:
+    var(--font-plus-jakarta-sans), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+
+  --font-app-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+.dark {
+  /* ---------- Backgrounds ---------- */
+  --background: #151614;
+  --background-secondary: #191b19;
+  --background-section: #1c1f1c;
+
+  /* ---------- Surfaces ---------- */
+  --surface: #1d1f1c;
+  --surface-elevated: #252824;
+  --surface-subtle: #2a2e2a;
+
+  /* ---------- Teal ---------- */
+  --teal: #5fa9a3;
+  --teal-dark: #397d78;
+  --teal-hover: #6db6b0;
+  --teal-light: #1e3836;
+  --teal-subtle: #1e3836;
+
+  /* ---------- Amber ---------- */
+  --amber: #e0a652;
+  --amber-dark: #e0a652;
+  --amber-light: #3a2f1d;
+  --amber-subtle: #3a2f1d;
+
+  /* ---------- Terracotta ---------- */
+  --terracotta: #d28a70;
+  --terracotta-light: #3a2823;
+
+  /* ---------- Text ---------- */
+  --foreground: #f4f2ec;
+  --foreground-secondary: #b4b0a7;
+  --foreground-muted: #89857d;
+  --foreground-disabled: #66635d;
+
+  /* ---------- Borders ---------- */
+  --border: #343831;
+  --border-subtle: #2a2d29;
+  --border-strong: #41453f;
+
+  /* ---------- Semantic ---------- */
+  --success: #72b38c;
+  --error: #d97979;
+  --warning: var(--amber);
+
+  /* ---------- Category colors (softened for dark surfaces) ---------- */
+  --category-work: var(--teal);
+  --category-food: var(--amber);
+  --category-music: var(--terracotta);
+  --category-fitness: #72b38c;
+  --category-learning: #6fa0c7;
+  --category-ideas: #d9b65c;
+  --category-personal: #d9a3a3;
+  --category-travel: #4fb0aa;
+  --category-other: #89857d;
+
+  --shadow-subtle: none;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-secondary: var(--background-secondary);
+  --color-background-section: var(--background-section);
+
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-subtle: var(--surface-subtle);
+
+  --color-teal: var(--teal);
+  --color-teal-dark: var(--teal-dark);
+  --color-teal-hover: var(--teal-hover);
+  --color-teal-light: var(--teal-light);
+  --color-teal-subtle: var(--teal-subtle);
+
+  --color-amber: var(--amber);
+  --color-amber-dark: var(--amber-dark);
+  --color-amber-light: var(--amber-light);
+  --color-amber-subtle: var(--amber-subtle);
+
+  --color-terracotta: var(--terracotta);
+  --color-terracotta-light: var(--terracotta-light);
+
+  --color-foreground: var(--foreground);
+  --color-foreground-secondary: var(--foreground-secondary);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-disabled: var(--foreground-disabled);
+
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
+
+  --color-category-work: var(--category-work);
+  --color-category-food: var(--category-food);
+  --color-category-music: var(--category-music);
+  --color-category-fitness: var(--category-fitness);
+  --color-category-learning: var(--category-learning);
+  --color-category-ideas: var(--category-ideas);
+  --color-category-personal: var(--category-personal);
+  --color-category-travel: var(--category-travel);
+  --color-category-other: var(--category-other);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-full: var(--radius-full);
+
+  --shadow-subtle: var(--shadow-subtle);
+
+  --font-sans: var(--font-app);
+  --font-mono: var(--font-app-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-app);
+}
