@@ -32,7 +32,7 @@ export function QuickCaptureBar({ prompt }: { prompt: string }) {
 
       <span className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal px-6 text-sm font-semibold text-background transition-colors group-hover:bg-teal-hover md:w-auto">
         <Plus className="size-4" aria-hidden />
-        <span className="text-xl lg:text-[16px]">Capture a Moment</span>
+        <span className="text-xl md:text-[16px]">Capture a Moment</span>
       </span>
     </Link>
   );

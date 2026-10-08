@@ -25,7 +25,6 @@ export function AppShell({ user, children }: AppShellProps) {
         <MobileHeader />
         <main
           id="main-content"
-          className="px-4 pb-28 pt-6 md:px-8 md:pb-16 md:pt-10 xl:px-10"
         >
           {children}
         </main>

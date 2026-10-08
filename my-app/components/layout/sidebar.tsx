@@ -22,7 +22,7 @@ export function Sidebar({ user }: SidebarProps) {
           aria-label="Life Replay home"
           className="flex items-center justify-center gap-2 rounded-lg p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal xl:justify-start"
         >
-          <Logo className="size-8 shrink-0" />
+          <Logo className="size-12 shrink-0" />
           <span className="hidden xl:block">
             <span className="block text-[19px] font-bold leading-6 text-foreground">
               Life Replay

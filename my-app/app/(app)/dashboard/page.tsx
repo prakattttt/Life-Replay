@@ -15,7 +15,7 @@ export default async function DashboardPage() {
   const data = await getHomeData(now);
 
   return (
-    <div className="relative isolate overflow-clip">
+    <div className="relative isolate overflow-clip px-4 pb-28 pt-6 md:px-8 md:pb-16 md:pt-10 xl:px-10">
       {/* Warm ambient glow behind the editorial header (decorative). */}
       <div
         aria-hidden

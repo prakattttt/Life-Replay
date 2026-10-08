@@ -7,7 +7,7 @@ export function MobileHeader() {
   return (
     <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-background/85 px-4 backdrop-blur md:hidden">
       <div className="flex items-center gap-2">
-        <Logo className="size-6" />
+        <Logo className="size-8" />
         <span className="text-xs font-bold uppercase tracking-widest text-foreground-secondary">
           Life Replay
         </span>
