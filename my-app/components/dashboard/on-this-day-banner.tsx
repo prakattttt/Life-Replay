@@ -90,7 +90,7 @@ export function OnThisDayBanner({ data, now }: OnThisDayBannerProps) {
 
       <div className="relative hidden min-h-64 md:block">
         <MomentImage
-          src={moment.imageUrl}
+          src={null}
           alt=""
           sizes="(min-width: 1280px) 404px, 320px"
         />

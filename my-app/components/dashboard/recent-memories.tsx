@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { format } from "date-fns";
-import { TimelineEntry } from "@/components/timeline/timeline-entry";
+import { TimelineEntry } from "@/components/dashboard/timeline-entry";
 import type { Moment } from "@/types/moment";
 
 export function RecentMemories({
