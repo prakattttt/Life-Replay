@@ -12,11 +12,6 @@ export const MOMENT_CATEGORIES = [
 
 export type MomentCategory = (typeof MOMENT_CATEGORIES)[number];
 
-/**
- * UI-facing moment shape.
- * TODO: once `src/db/schema.ts` exists, derive this from the Drizzle table
- * (`typeof moments.$inferSelect`) instead of maintaining it by hand.
- */
 export type Moment = {
   id: string;
   title: string;
