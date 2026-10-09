@@ -15,7 +15,7 @@ export default async function DashboardPage() {
   const data = await getHomeData(now);
 
   return (
-    <div className="relative isolate overflow-clip px-4 pb-28 pt-6 md:px-8 md:pb-16 md:pt-10 xl:px-10">
+    <div className="relative isolate overflow-clip">
       {/* Warm ambient glow behind the editorial header (decorative). */}
       <div
         aria-hidden
@@ -26,7 +26,7 @@ export default async function DashboardPage() {
         className="pointer-events-none absolute -left-24 top-40 -z-10 size-80 rounded-full bg-teal-light/40 blur-3xl"
       />
 
-      <div className="mx-auto flex w-full max-w-242.5 flex-col gap-10 md:gap-12">
+      <div className="mx-auto flex w-full max-w-242.5 flex-col gap-10 md:gap-12 px-4 pb-28 pt-6 md:px-8 md:pb-16 md:pt-10 xl:px-10">
         <FadeIn>
           <GreetingHeader
             name={mockUser.name}
