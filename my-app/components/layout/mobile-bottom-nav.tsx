@@ -11,11 +11,20 @@ export function MobileBottomNav() {
       className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
     >
       <ul className="grid h-16 grid-cols-5 items-center px-2">
-        {mobileNavLeft.map((item) => (
-          <li key={item.href} className="flex justify-center">
-            <NavLink item={item} variant="bottom" />
-          </li>
-        ))}
+        {mobileNavLeft.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <li key={item.href} className="flex justify-center">
+              <NavLink
+                href={item.href}
+                label={item.label}
+                icon={<Icon className="size-5" aria-hidden />}
+                variant="bottom"
+              />
+            </li>
+          );
+        })}
 
         <li className="flex justify-center">
           <Link
@@ -27,11 +36,20 @@ export function MobileBottomNav() {
           </Link>
         </li>
 
-        {mobileNavRight.map((item) => (
-          <li key={item.href} className="flex justify-center">
-            <NavLink item={item} variant="bottom" />
-          </li>
-        ))}
+        {mobileNavRight.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <li key={item.href} className="flex justify-center">
+              <NavLink
+                href={item.href}
+                label={item.label}
+                icon={<Icon className="size-5" aria-hidden />}
+                variant="bottom"
+              />
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );

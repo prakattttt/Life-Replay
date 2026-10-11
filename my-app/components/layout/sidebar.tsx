@@ -10,7 +10,7 @@ type SidebarProps = {
 };
 
 /**
- * Icon-only at md (768px+), full 230px at xl (1280px+).
+ * Server component. Icon-only at md (768px+), full 230px at xl (1280px+).
  * Hidden on mobile, where the bottom nav takes over.
  */
 export function Sidebar({ user }: SidebarProps) {
@@ -22,7 +22,7 @@ export function Sidebar({ user }: SidebarProps) {
           aria-label="Life Replay home"
           className="flex items-center justify-center gap-2 rounded-lg p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal xl:justify-start"
         >
-          <Logo className="size-12 shrink-0" />
+          <Logo className="size-8 shrink-0" />
           <span className="hidden xl:block">
             <span className="block text-[19px] font-bold leading-6 text-foreground">
               Life Replay
@@ -49,11 +49,20 @@ export function Sidebar({ user }: SidebarProps) {
                 {group.heading}
               </p>
               <ul className="flex flex-col gap-1">
-                {group.items.map((item) => (
-                  <li key={item.href}>
-                    <NavLink item={item} variant="sidebar" />
-                  </li>
-                ))}
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+
+                  return (
+                    <li key={item.href}>
+                      <NavLink
+                        href={item.href}
+                        label={item.label}
+                        icon={<Icon className="size-4.5 shrink-0" aria-hidden />}
+                        variant="sidebar"
+                      />
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
@@ -61,7 +70,18 @@ export function Sidebar({ user }: SidebarProps) {
       </div>
 
       <div className="flex flex-col gap-2 border-t border-border p-3 xl:p-4">
-        <NavLink item={settingsItem} variant="sidebar" />
+        {(() => {
+          const SettingsIcon = settingsItem.icon;
+
+          return (
+            <NavLink
+              href={settingsItem.href}
+              label={settingsItem.label}
+              icon={<SettingsIcon className="size-4.5 shrink-0" aria-hidden />}
+              variant="sidebar"
+            />
+          );
+        })()}
         <Link
           href="/profile"
           aria-label={`Profile: ${user.name}`}

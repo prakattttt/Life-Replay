@@ -2,60 +2,43 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Archive,
-  CalendarHeart,
-  History,
-  House,
-  Search,
-  Settings,
-  User,
-} from "lucide-react";
 import { cn } from "@/app/lib/utils";
-import type { NavItem } from "./nav-items";
-
-const icons = {
-  archive: Archive,
-  "calendar-heart": CalendarHeart,
-  history: History,
-  house: House,
-  search: Search,
-  settings: Settings,
-  user: User,
-};
 
 type NavLinkProps = {
-  item: NavItem;
+  href: string;
+  label: string;
+  icon: React.ReactNode;
   variant: "sidebar" | "bottom";
 };
 
-export function NavLink({ item, variant }: NavLinkProps) {
+/** Client component only because it needs the current pathname. */
+export function NavLink({ href, label, icon, variant }: NavLinkProps) {
   const pathname = usePathname();
   const isActive =
-    pathname === item.href || pathname.startsWith(`${item.href}/`);
-  const Icon = icons[item.icon];
+    pathname === href ||
+    (pathname.startsWith(`${href}/`) && pathname !== "/moments/new");
 
   if (variant === "bottom") {
     return (
       <Link
-        href={item.href}
+        href={href}
         aria-current={isActive ? "page" : undefined}
         className={cn(
           "flex min-h-11 min-w-12 flex-col items-center justify-center gap-0.5 rounded-lg text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal",
           isActive ? "text-teal" : "text-foreground-secondary",
         )}
       >
-        <Icon className="size-5" aria-hidden />
-        {item.label}
+        {icon}
+        {label}
       </Link>
     );
   }
 
   return (
     <Link
-      href={item.href}
+      href={href}
       aria-current={isActive ? "page" : undefined}
-      title={item.label}
+      title={label}
       className={cn(
         "flex min-h-11 items-center justify-center gap-3 rounded-lg px-3 text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal xl:justify-start",
         isActive
@@ -63,9 +46,9 @@ export function NavLink({ item, variant }: NavLinkProps) {
           : "text-foreground-secondary hover:bg-background-secondary hover:text-foreground",
       )}
     >
-      <Icon className="size-4.5 shrink-0" aria-hidden />
+      {icon}
       {/* Compact (tablet) sidebar is icon-only; label stays for screen readers. */}
-      <span className="sr-only xl:not-sr-only">{item.label}</span>
+      <span className="sr-only xl:not-sr-only">{label}</span>
     </Link>
   );
 }
