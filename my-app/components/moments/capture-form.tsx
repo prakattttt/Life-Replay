@@ -198,7 +198,7 @@ export function CaptureForm({ prompt }: CaptureFormProps) {
     });
   }
 
-  function handleSubmitEvent(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmitEvent(event: React.SubmitEvent<HTMLFormElement>) {
     // "Just now" must mean the moment of saving, not when the page opened.
     setValue("occurredAt", whenToIso(when));
     void handleSubmit(onValid)(event);
@@ -270,7 +270,7 @@ export function CaptureForm({ prompt }: CaptureFormProps) {
         )}
 
         {/* Disabled while saving so nothing changes mid-submit. */}
-        <fieldset disabled={isPending} className="contents">
+        <fieldset key={savedCount} disabled={isPending} className="contents">
           <WhenPicker value={when} onChange={changeWhen} error={errors.occurredAt?.message} />
 
           {/* The memory: the only field that really matters */}
