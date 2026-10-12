@@ -1,14 +1,16 @@
 import { CaptureShell } from "@/components/layout/capture-shell";
-import { mockUser } from "@/features/home/mock-data";
+import { redirect } from "next/navigation";
+import { getSession } from "@/features/auth/session";
 
 export default async function CaptureLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // TODO: use the real Better Auth session, and redirect to /login when there
-  // is none (same change as in app/(app)/layout.tsx).
-  const user = mockUser;
+  const session = await getSession();
+  if (!session) redirect("/login");
+
+  const user = { name: session.user.name, email: session.user.email };
 
   return <CaptureShell user={user}>{children}</CaptureShell>;
 }
