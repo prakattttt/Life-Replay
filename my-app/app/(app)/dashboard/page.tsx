@@ -6,12 +6,14 @@ import { RecentMemories } from "@/components/dashboard/recent-memories";
 import { TodaysMoments } from "@/components/dashboard/todays-moments";
 import { FadeIn } from "@/components/ui/fade-in";
 import { getPromptOfTheDay } from "@/features/home/greeting";
-import { getHomeData, mockUser } from "@/features/home/mock-data";
+import { getSession } from "@/features/auth/session";
+import { getHomeData } from "@/features/home/mock-data";
 
 export const metadata: Metadata = { title: "Home" };
 
 export default async function DashboardPage() {
   const now = new Date();
+  const session = await getSession();
   const data = await getHomeData(now);
 
   return (
@@ -29,7 +31,7 @@ export default async function DashboardPage() {
       <div className="mx-auto flex w-full max-w-242.5 flex-col gap-10 md:gap-12 px-4 pb-28 pt-6 md:px-8 md:pb-16 md:pt-10 xl:px-10">
         <FadeIn>
           <GreetingHeader
-            name={mockUser.name}
+            name={session?.user.name ?? "there"}
             now={now}
             totalMoments={data.totalMoments}
           />

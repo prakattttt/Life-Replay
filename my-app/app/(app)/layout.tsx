@@ -1,13 +1,16 @@
 import { AppShell } from "@/components/layout/app-shell";
-import { mockUser } from "@/features/home/mock-data";
+import { redirect } from "next/navigation";
+import { getSession } from "@/features/auth/session";
 
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-// Real session later on using Better Auth
-  const user = mockUser;
+  const session = await getSession();
+  if (!session) redirect("/login");
+
+  const user = { name: session.user.name, email: session.user.email };
 
   return <AppShell user={user}>{children}</AppShell>;
 }

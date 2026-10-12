@@ -1,9 +1,15 @@
-import { MOCK_USER_ID } from "@/features/timeline/mock-data";
+import { headers } from "next/headers";
+import { auth } from "@/app/lib/auth";
+
+export async function getSession() {
+  return auth.api.getSession({ headers: await headers() });
+}
 
 /**
  * The signed-in user's id, or null when there is no session.
  * The id must come from the session, never from the request. 
  */
 export async function getSessionUserId(): Promise<string | null> {
-  return MOCK_USER_ID;
+  const session = await getSession();
+  return session?.user.id ?? null;
 }
