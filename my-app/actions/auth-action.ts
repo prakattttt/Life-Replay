@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import type {
   ForgotPasswordInput,
   LoginInput,
@@ -82,6 +83,19 @@ export async function requestPasswordReset(
       code: getErrorCode(error),
       message: GENERIC_AUTH_ERROR,
     };
+  }
+}
+
+export async function signOut() {
+  try {
+    await auth.api.signOut({ headers: await headers() });
+    return { ok: true }
+  } catch (error) {
+    return {
+      ok: false,
+      getErrorCode: error,
+      message: GENERIC_AUTH_ERROR,
+    }
   }
 }
 

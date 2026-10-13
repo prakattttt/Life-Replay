@@ -5,12 +5,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, LogOut } from "lucide-react";
 import { cn } from "@/app/lib/utils";
-import { GENERIC_ERROR, signOut } from "@/features/profile/profile-actions";
+import { signOut } from "@/actions/auth-action";
+import { GENERIC_ERROR } from "@/features/profile/profile-actions";
 
-/**
- * The logout button. It calls `signOut()` from features/profile/profile-actions,
- * then sends the person to /login. On failure it stays put and says so.
- */
 export function SignOutButton({ className }: { className?: string }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
