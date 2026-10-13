@@ -3,12 +3,18 @@ import Link from "next/link";
 import { ChevronRight, SlidersHorizontal } from "lucide-react";
 import { EditProfileForm } from "@/components/profile/edit-profile-form";
 import { SectionCard } from "@/components/profile/section-card";
-import { getProfile } from "@/features/profile/mock-data";
+import { getSession } from "@/features/auth/session";
 
 export const metadata: Metadata = { title: "Profile · Life Replay" };
 
 export default async function ProfilePage() {
-  const profile = await getProfile();
+  const session = await getSession();
+
+  const profile = {
+    name: session?.user.name ?? "",
+    email: session?.user.email ?? "",
+    imageUrl: session?.user.image ?? null,
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -18,7 +24,7 @@ export default async function ProfilePage() {
         description="How you appear in Life Replay. Only you can see your archive."
       >
         <EditProfileForm
-          profile={{ name: profile.name, email: profile.email, imageUrl: profile.imageUrl }}
+          profile={profile}
         />
       </SectionCard>
 

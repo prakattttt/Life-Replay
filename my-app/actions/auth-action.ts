@@ -86,16 +86,16 @@ export async function requestPasswordReset(
   }
 }
 
-export async function signOut() {
+export async function signOut(): Promise<AuthResult> {
   try {
     await auth.api.signOut({ headers: await headers() });
-    return { ok: true }
+    return { ok: true };
   } catch (error) {
     return {
       ok: false,
-      getErrorCode: error,
+      code: getErrorCode(error),
       message: GENERIC_AUTH_ERROR,
-    }
+    };
   }
 }
 

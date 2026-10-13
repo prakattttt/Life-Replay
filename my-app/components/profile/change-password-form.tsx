@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { FormAlert } from "@/components/auth/form-alert";
@@ -27,14 +27,14 @@ export function ChangePasswordForm() {
     handleSubmit,
     reset,
     setError,
-    watch,
+    control,
     formState: { errors },
   } = useForm<ChangePasswordInput>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: EMPTY,
   });
 
-  const newPassword = watch("newPassword");
+  const newPassword = useWatch({ control, name: "newPassword" });
 
   function onValid(values: ChangePasswordInput) {
     setFormError(null);
