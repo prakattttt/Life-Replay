@@ -4,7 +4,7 @@ import { drizzleAdapter } from "@better-auth/drizzle-adapter/relations-v2";
 import { nextCookies } from "better-auth/next-js";
 
 import { db } from "./db";
-import * as schema from "../db/schema";
+import * as schema from "../db/auth-schema";
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,

@@ -13,13 +13,17 @@ export function groupMomentsByDay(moments: Moment[]): DayGroup[] {
   const groups: DayGroup[] = [];
 
   for (const moment of moments) {
-    const key = format(moment.occurredAt, "yyyy-MM-dd");
+    const key = moment.occurredOn ?? format(moment.occurredAt, "yyyy-MM-dd");
     const last = groups[groups.length - 1];
 
     if (last?.key === key) {
       last.moments.push(moment);
     } else {
-      groups.push({ key, date: moment.occurredAt, moments: [moment] });
+      const [year, month, day] = key.split("-").map(Number);
+      const date = moment.occurredOn
+        ? new Date(year, month - 1, day)
+        : moment.occurredAt;
+      groups.push({ key, date, moments: [moment] });
     }
   }
 

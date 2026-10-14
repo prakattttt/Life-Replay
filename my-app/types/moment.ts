@@ -19,4 +19,6 @@ export type Moment = {
   category: MomentCategory;
   imageUrl: string | null;
   occurredAt: Date;
+  occurredOn?: string;
+  timezone?: string;
 };
