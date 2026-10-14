@@ -6,7 +6,10 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signInWithEmail } from "@/actions/auth-action";
-import { GENERIC_AUTH_ERROR, type AuthResult } from "@/features/auth/auth-helper";
+import {
+  GENERIC_AUTH_ERROR,
+  type AuthResult,
+} from "@/features/auth/auth-helper";
 import { loginSchema, type LoginInput } from "@/schemas/auth";
 import { FormAlert } from "./form-alert";
 import { PasswordField } from "./password-field";

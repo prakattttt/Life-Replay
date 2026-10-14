@@ -40,7 +40,10 @@ export function SignOutButton({ className }: { className?: string }) {
       )}
     >
       {isPending ? (
-        <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden />
+        <Loader2
+          className="size-4 animate-spin motion-reduce:animate-none"
+          aria-hidden
+        />
       ) : (
         <LogOut className="size-4" aria-hidden />
       )}

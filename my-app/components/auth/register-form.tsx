@@ -6,13 +6,17 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock } from "lucide-react";
 import { signUpWithEmail } from "@/actions/auth-action";
-import { GENERIC_AUTH_ERROR, type AuthResult } from "@/features/auth/auth-helper";
+import {
+  GENERIC_AUTH_ERROR,
+  type AuthResult,
+} from "@/features/auth/auth-helper";
 import { registerSchema, type RegisterInput } from "@/schemas/auth";
 import { FormAlert } from "./form-alert";
 import { PasswordField } from "./password-field";
 import { PasswordStrength } from "./password-strength";
 import { SubmitButton } from "./submit-button";
 import { TextField } from "./text-field";
+import { toast } from "sonner";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -47,15 +51,18 @@ export function RegisterForm() {
       if (!result.ok) {
         const fieldErrors = result.fieldErrors ?? {};
         if (fieldErrors.name) setError("name", { message: fieldErrors.name });
-        if (fieldErrors.email) setError("email", { message: fieldErrors.email });
-        if (fieldErrors.password) setError("password", { message: fieldErrors.password });
-        
+        if (fieldErrors.email)
+          setError("email", { message: fieldErrors.email });
+        if (fieldErrors.password)
+          setError("password", { message: fieldErrors.password });
+
         if (Object.keys(fieldErrors).length === 0) setFormError(result.message);
         return;
       }
 
       router.push("/dashboard");
       router.refresh();
+      toast.success("User registered successfully.");
     });
   }
 
