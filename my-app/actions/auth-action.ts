@@ -13,6 +13,7 @@ import {
   GENERIC_AUTH_ERROR,
 } from "@/features/auth/auth-helper";
 import { auth } from "@/app/lib/auth";
+import { updateProfileSchema, type UpdateProfileInput } from "@/schemas/profile";
 
 export async function signInWithEmail(input: LoginInput): Promise<AuthResult> {
   try {
@@ -66,15 +67,55 @@ export async function signUpWithEmail(
   }
 }
 
-export async function requestPasswordReset(
-  input: ForgotPasswordInput,
-): Promise<AuthResult> {
+export async function signOut(): Promise<AuthResult> {
   try {
-    await auth.api.requestPasswordReset({
-      body: {
-        email: input.email,
-        redirectTo: "/reset-password",
+    await auth.api.signOut({ headers: await headers() });
+    return { ok: true };
+  } catch (error) {
+    return {
+      ok: false,
+      code: getErrorCode(error),
+      message: GENERIC_AUTH_ERROR,
+    };
+  }
+}
+
+export async function updateUser(user: UpdateProfileInput): Promise<AuthResult> {
+  const parsed = updateProfileSchema.safeParse(user);
+  if (!parsed.success) {
+    const issues = parsed.error.issues;
+    const nameError = issues.find((issue) => issue.path[0] === "name")?.message;
+    const emailError = issues.find((issue) => issue.path[0] === "email")?.message;
+    return {
+      ok: false,
+      message: GENERIC_AUTH_ERROR,
+      fieldErrors: {
+        ...(nameError ? { name: nameError } : {}),
+        ...(emailError ? { email: emailError } : {}),
       },
+    };
+  }
+
+  try {
+    const requestHeaders = await headers();
+    const session = await auth.api.getSession({ headers: requestHeaders });
+    if (!session) {
+      return { ok: false, message: "Your session has expired. Please sign in again." };
+    }
+
+    if (parsed.data.email !== session.user.email.trim().toLowerCase()) {
+      return {
+        ok: false,
+        message: "Email changes are not available yet.",
+        fieldErrors: {
+          email: "Email changes require a verification flow that is not configured yet.",
+        },
+      };
+    }
+
+    await auth.api.updateUser({
+      body: { name: parsed.data.name },
+      headers: requestHeaders,
     });
     return { ok: true };
   } catch (error) {
@@ -86,9 +127,16 @@ export async function requestPasswordReset(
   }
 }
 
-export async function signOut(): Promise<AuthResult> {
+export async function requestPasswordReset(
+  input: ForgotPasswordInput,
+): Promise<AuthResult> {
   try {
-    await auth.api.signOut({ headers: await headers() });
+    await auth.api.requestPasswordReset({
+      body: {
+        email: input.email,
+        redirectTo: "/reset-password",
+      },
+    });
     return { ok: true };
   } catch (error) {
     return {

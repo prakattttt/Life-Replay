@@ -8,9 +8,9 @@ import { toast } from "sonner";
 import { Camera, Loader2 } from "lucide-react";
 import { FormAlert } from "@/components/auth/form-alert";
 import { TextField } from "@/components/auth/text-field";
+import { updateUser } from "@/actions/auth-action";
 import {
   GENERIC_ERROR,
-  updateProfile,
   type ActionResult,
 } from "@/features/profile/profile-actions";
 import {
@@ -97,14 +97,17 @@ export function EditProfileForm({ profile }: EditProfileFormProps) {
   function onValid(values: UpdateProfileInput) {
     setFormError(null);
 
+    if (staged || removePhoto) {
+      setFormError(
+        "Profile photo storage is not configured yet. Discard the photo change before saving your details.",
+      );
+      return;
+    }
+
     startTransition(async () => {
       let result: ActionResult;
       try {
-        result = await updateProfile({
-          ...values,
-          photo: staged?.file ?? null,
-          removePhoto,
-        });
+        result = await updateUser(values);
       } catch {
         setFormError(GENERIC_ERROR);
         return;
