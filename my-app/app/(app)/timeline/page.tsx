@@ -8,8 +8,8 @@ import { TimelineEmptyState } from "@/components/timeline/timeline-empty-state";
 import { TimelineEndMarker } from "@/components/timeline/timeline-end-marker";
 import { TimelineHeader } from "@/components/timeline/timeline-header";
 import { FadeIn } from "@/components/ui/fade-in";
+import { getSessionUserId } from "@/features/auth/session";
 import { groupMomentsByDay } from "@/features/timeline/group";
-import { MOCK_USER_ID } from "@/features/timeline/mock-data";
 import {
   parseTimelineSearchParams,
   type RawSearchParams,
@@ -18,6 +18,7 @@ import {
   getTimelineFilterOptions,
   getTimelineMoments,
 } from "@/features/timeline/queries";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = { title: "Timeline" };
 
@@ -29,7 +30,8 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
   const now = new Date();
   const query = parseTimelineSearchParams(await searchParams, now);
 
-  const userId = MOCK_USER_ID;
+  const userId = await getSessionUserId();
+  if (!userId) redirect("/login");
 
   const [result, options] = await Promise.all([
     getTimelineMoments(userId, query, now),

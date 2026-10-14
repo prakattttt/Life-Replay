@@ -7,7 +7,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Check, Loader2 } from "lucide-react";
-import { createMoment, type CreateMomentResult } from "@/actions/moments";
+import { createMoment, type CreateMomentResult } from "@/actions/moments-action";
 import { clearDraft, loadDraft, saveDraft } from "@/features/moments/draft";
 import { suggestCategory } from "@/features/moments/suggest-category";
 import { whenToIso, type When } from "@/features/moments/when";
@@ -143,6 +143,7 @@ export function CaptureForm({ prompt }: CaptureFormProps) {
     formData.set("description", values.description);
     formData.set("category", values.category);
     formData.set("occurredAt", values.occurredAt);
+    formData.set("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC");
     if (image) formData.set("image", image);
 
     startTransition(async () => {

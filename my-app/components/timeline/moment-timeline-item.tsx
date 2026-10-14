@@ -39,7 +39,13 @@ export function MomentTimelineItem({ moment }: { moment: Moment }) {
             dateTime={moment.occurredAt.toISOString()}
             className="text-xs font-bold text-foreground-muted"
           >
-            {format(moment.occurredAt, "h:mm a")}
+            {moment.timezone
+              ? new Intl.DateTimeFormat(undefined, {
+                  hour: "numeric",
+                  minute: "2-digit",
+                  timeZone: moment.timezone,
+                }).format(moment.occurredAt)
+              : format(moment.occurredAt, "h:mm a")}
           </time>
           <CategoryBadge category={moment.category} />
         </div>
