@@ -1,14 +1,8 @@
-import { addMonths } from "date-fns";
+import { and, count, desc, eq, gte, lt, sql } from "drizzle-orm";
+import { moment } from "@/app/db/schema";
+import { db } from "@/app/lib/db";
 import type { Moment } from "@/types/moment";
-import { getMockMoments } from "./mock-data";
 import { TIMELINE_PAGE_SIZE, type TimelineQuery } from "./params";
-
-/**
- * MOCK QUERIES with the shape the real Drizzle queries will have.
- * Every function takes `userId` first: in the real version each query must
- * include `eq(moments.userId, userId)` (AGENTS.md §10), and `userId` must come
- * from the authenticated session, never from the URL.
- */
 
 export type TimelineMomentsResult = {
   moments: Moment[];
@@ -24,29 +18,42 @@ export async function getTimelineMoments(
   query: TimelineQuery,
   now: Date,
 ): Promise<TimelineMomentsResult> {
-  void userId; // scoped in the real query: WHERE user_id = $1
-
-  // Real query: WHERE user_id = $1
-  //   AND occurred_at >= $monthStart AND occurred_at < $nextMonthStart
-  //   [AND category = $category] ORDER BY occurred_at DESC LIMIT $take
-  // Month boundaries use the server timezone here; switch to the user's
-  // timezone once settings exist (AGENTS.md §15).
-  const monthStart = new Date(query.year, query.month - 1, 1);
-  const monthEnd = addMonths(monthStart, 1);
-
-  const inMonth = getMockMoments(now).filter(
-    (moment) =>
-      moment.occurredAt >= monthStart &&
-      moment.occurredAt < monthEnd &&
-      (query.category === null || moment.category === query.category),
-  );
-
+  void now;
+  const monthStart = `${query.year}-${String(query.month).padStart(2, "0")}-01`;
+  const nextMonth = new Date(Date.UTC(query.year, query.month, 1));
+  const monthEnd = `${nextMonth.getUTCFullYear()}-${String(nextMonth.getUTCMonth() + 1).padStart(2, "0")}-01`;
+  const conditions = [
+    eq(moment.userId, userId),
+    gte(moment.occurredOn, monthStart),
+    lt(moment.occurredOn, monthEnd),
+  ];
+  if (query.category) conditions.push(eq(moment.category, query.category));
+  const where = and(...conditions);
   const take = TIMELINE_PAGE_SIZE * query.page;
-  const remaining = Math.max(inMonth.length - take, 0);
+  const [rows, [totalRow]] = await Promise.all([
+    db
+      .select({
+        id: moment.id,
+        title: moment.title,
+        description: moment.description,
+        category: moment.category,
+        imageUrl: moment.imageUrl,
+        occurredAt: moment.occurredAt,
+        occurredOn: moment.occurredOn,
+        timezone: moment.timezone,
+      })
+      .from(moment)
+      .where(where)
+      .orderBy(desc(moment.occurredOn), desc(moment.occurredAt))
+      .limit(take),
+    db.select({ total: count() }).from(moment).where(where),
+  ]);
+  const total = totalRow?.total ?? 0;
+  const remaining = Math.max(total - take, 0);
 
   return {
-    moments: inMonth.slice(0, take),
-    total: inMonth.length,
+    moments: rows satisfies Moment[],
+    total,
     hasMore: remaining > 0,
     nextBatchSize: Math.min(remaining, TIMELINE_PAGE_SIZE),
   };
@@ -65,23 +72,38 @@ export async function getTimelineFilterOptions(
   selectedYear: number,
   now: Date,
 ): Promise<TimelineFilterOptions> {
-  void userId;
+  const yearPart = sql<number>`extract(year from ${moment.occurredOn})::int`;
+  const monthPart = sql<number>`extract(month from ${moment.occurredOn})::int`;
+  const selectedYearStart = `${selectedYear}-01-01`;
+  const selectedYearEnd = `${selectedYear + 1}-01-01`;
+  const [yearRows, monthRows, [totalRow]] = await Promise.all([
+    db
+      .select({ year: yearPart })
+      .from(moment)
+      .where(eq(moment.userId, userId))
+      .groupBy(yearPart)
+      .orderBy(desc(yearPart)),
+    db
+      .select({ month: monthPart, count: count() })
+      .from(moment)
+      .where(
+        and(
+          eq(moment.userId, userId),
+          gte(moment.occurredOn, selectedYearStart),
+          lt(moment.occurredOn, selectedYearEnd),
+        ),
+      )
+      .groupBy(monthPart),
+    db.select({ total: count() }).from(moment).where(eq(moment.userId, userId)),
+  ]);
 
-  // Real queries: SELECT DISTINCT extract(year ...) and a
-  // GROUP BY extract(month ...) count, both scoped to the user.
-  const all = getMockMoments(now);
-  const years = new Set<number>([now.getFullYear()]);
+  const years = new Set<number>([now.getFullYear(), ...yearRows.map(({ year }) => year)]);
   const monthCounts = Array.from({ length: 12 }, () => 0);
-
-  for (const moment of all) {
-    const year = moment.occurredAt.getFullYear();
-    years.add(year);
-    if (year === selectedYear) monthCounts[moment.occurredAt.getMonth()] += 1;
-  }
+  for (const row of monthRows) monthCounts[row.month - 1] = row.count;
 
   return {
     years: [...years].sort((a, b) => b - a),
     monthCounts,
-    totalMoments: all.length,
+    totalMoments: totalRow?.total ?? 0,
   };
 }
