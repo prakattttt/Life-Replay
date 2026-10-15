@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { GreetingHeader } from "@/components/dashboard/greeting-header";
 import { OnThisDayBanner } from "@/components/dashboard/on-this-day-banner";
@@ -10,6 +11,7 @@ import { FadeIn } from "@/components/ui/fade-in";
 import { getPromptOfTheDay } from "@/features/home/greeting";
 import { deserializeHomeData, type SerializedHomeData } from "@/features/home/transport";
 import type { HomeData } from "@/features/home/queries";
+import { apiClient } from "@/lib/api-client";
 
 type LoadState =
   | { status: "loading" }
@@ -22,17 +24,20 @@ export function DashboardContent({ name, now }: { name: string; now: Date }) {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/home", { cache: "no-store", signal: controller.signal })
-      .then(async (response) => {
-        if (!response.ok) throw new Error("We couldn’t load your archive.");
-        return (await response.json()) as SerializedHomeData;
-      })
+    apiClient
+      .get<SerializedHomeData>("/api/home", { signal: controller.signal })
+      .then(({ data }) => data)
       .then((data) => setState({ status: "ready", data: deserializeHomeData(data) }))
       .catch((error: unknown) => {
         if (controller.signal.aborted) return;
         setState({
           status: "error",
-          message: error instanceof Error ? error.message : "We couldn’t load your archive.",
+          message:
+            axios.isAxiosError(error) && error.response
+              ? "We couldn’t load your archive."
+              : error instanceof Error
+                ? error.message
+                : "We couldn’t load your archive.",
         });
       });
 
