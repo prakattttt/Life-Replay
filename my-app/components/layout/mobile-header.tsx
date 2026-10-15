@@ -1,4 +1,6 @@
 import { format } from "date-fns";
+import Link from "next/link";
+import { Search } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Logo } from "./logo";
 
@@ -17,6 +19,13 @@ export function MobileHeader() {
         <time className="text-xs font-semibold text-foreground-secondary">
           {format(new Date(), "EEE, MMM d")}
         </time>
+        <Link
+          href="/search"
+          aria-label="Search memories"
+          className="grid size-11 place-items-center rounded-lg text-foreground-secondary transition-colors hover:bg-background-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
+        >
+          <Search className="size-5" aria-hidden="true" />
+        </Link>
         <ThemeToggle />
       </div>
     </header>

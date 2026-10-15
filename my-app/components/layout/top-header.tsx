@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { Search } from "lucide-react";
+import { MomentSearchForm } from "@/components/moments/moment-search-form";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 /** Desktop/tablet header. Mobile uses MobileHeader instead. */
@@ -10,14 +9,8 @@ export function TopHeader() {
         Sanctuary • Editorial view
       </p>
 
-      <div className="flex items-center gap-1">
-        <Link
-          href="/search"
-          aria-label="Search moments"
-          className="grid size-11 place-items-center rounded-lg text-foreground-secondary transition-colors hover:bg-background-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
-        >
-          <Search className="size-5" aria-hidden />
-        </Link>
+      <div className="flex items-center gap-3">
+        <MomentSearchForm className="max-w-80" />
         <ThemeToggle />
       </div>
     </header>
