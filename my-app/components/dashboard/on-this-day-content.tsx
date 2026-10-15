@@ -1,9 +1,11 @@
 "use client";
 
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { CalendarHeart } from "lucide-react";
 import { TimelineEntry } from "@/components/dashboard/timeline-entry";
 import { FadeIn } from "@/components/ui/fade-in";
+import { apiClient } from "@/lib/api-client";
 import {
   deserializeMoment,
   type SerializedOnThisDayData,
@@ -15,17 +17,17 @@ type LoadState =
   | { status: "error"; message: string }
   | { status: "ready"; moments: Moment[]; timezone: string };
 
+const skeletonBlock = "rounded-md bg-background-secondary motion-safe:animate-pulse";
+
 export function OnThisDayContent() {
   const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState<LoadState>({ status: "loading" });
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/home/on-this-day", { cache: "no-store", signal: controller.signal })
-      .then(async (response) => {
-        if (!response.ok) throw new Error("We couldn’t load your memories.");
-        return (await response.json()) as SerializedOnThisDayData;
-      })
+    apiClient
+      .get<SerializedOnThisDayData>("/api/home/on-this-day", { signal: controller.signal })
+      .then(({ data }) => data)
       .then(({ moments, timezone }) =>
         setState({ status: "ready", moments: moments.map(deserializeMoment), timezone }),
       )
@@ -33,7 +35,12 @@ export function OnThisDayContent() {
         if (controller.signal.aborted) return;
         setState({
           status: "error",
-          message: error instanceof Error ? error.message : "We couldn’t load your memories.",
+          message:
+            axios.isAxiosError(error) && error.response
+              ? "We couldn’t load your memories."
+              : error instanceof Error
+                ? error.message
+                : "We couldn’t load your memories.",
         });
       });
 
@@ -41,12 +48,46 @@ export function OnThisDayContent() {
   }, [attempt]);
 
   if (state.status === "loading") {
-    return <p role="status" className="py-12 text-sm text-foreground-muted">Finding this day in your archive…</p>;
+    return (
+      <div
+        role="status"
+        aria-label="Finding memories from this day"
+        className="mx-auto flex w-full max-w-242.5 flex-col gap-8 px-4 pb-28 pt-6 md:gap-10 md:px-8 md:pb-16 md:pt-10 xl:px-10"
+      >
+        <span className="sr-only">Finding this day in your archive…</span>
+        <div aria-hidden="true" className="flex flex-col gap-3">
+          <div className={`${skeletonBlock} h-3 w-32`} />
+          <div className={`${skeletonBlock} h-10 w-full max-w-lg md:h-12`} />
+          <div className={`${skeletonBlock} h-4 w-52`} />
+        </div>
+
+        {[0, 1].map((year) => (
+          <section key={year} aria-hidden="true" className="flex flex-col gap-4">
+            <div className={`${skeletonBlock} h-7 w-28`} />
+            <ol className="flex flex-col gap-6">
+              {[0, 1].map((memory) => (
+                <li key={memory} className="relative pl-8 md:pl-10">
+                  <span className={`${skeletonBlock} absolute left-0 top-8 size-3 rounded-full`} />
+                  <div className="flex min-h-40 flex-col gap-5 rounded-xl border border-border-subtle bg-surface p-6 md:p-8">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className={`${skeletonBlock} h-4 w-36`} />
+                      <div className={`${skeletonBlock} h-6 w-20 rounded-full`} />
+                    </div>
+                    <div className={`${skeletonBlock} h-6 w-3/4 max-w-sm`} />
+                    <div className={`${skeletonBlock} h-4 w-full max-w-md`} />
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ))}
+      </div>
+    );
   }
 
   if (state.status === "error") {
     return (
-      <div role="alert" className="flex flex-col items-start gap-3 py-12">
+      <div role="alert" className="mx-auto flex w-full max-w-242.5 flex-col items-start gap-3 px-4 pb-28 pt-6 md:px-8 md:pb-16 md:pt-10 xl:px-10">
         <p className="text-sm text-error">{state.message}</p>
         <button
           type="button"
