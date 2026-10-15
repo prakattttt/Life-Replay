@@ -4,7 +4,6 @@ import type { ChangePasswordInput, UpdateProfileInput } from "@/schemas/profile"
 import type {
   ActionResult,
   ExportFormat,
-  ProfileData,
   Settings,
 } from "./types";
 
@@ -26,23 +25,6 @@ async function sendJson(path: string, method: string, body?: unknown): Promise<A
     return actionResult(response.data);
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) return actionResult(error.response.data);
-    throw error;
-  }
-}
-
-export async function fetchProfileData(): Promise<ProfileData> {
-  try {
-    const { data } = await apiClient.get<Omit<ProfileData, "profile"> & {
-      profile: Omit<ProfileData["profile"], "createdAt"> & { createdAt: string };
-    }>("/api/profile");
-    return {
-      ...data,
-      profile: { ...data.profile, createdAt: new Date(data.profile.createdAt) },
-    };
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      throw new Error("Could not load your profile.");
-    }
     throw error;
   }
 }

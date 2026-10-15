@@ -1,9 +1,6 @@
-import { count, eq, asc } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { moment, userSettings } from "@/app/db/schema";
-import { db } from "@/app/lib/db";
 import { auth } from "@/app/lib/auth";
-import type { ProfileData } from "@/features/profile/types";
+import { getProfileData } from "@/features/profile/queries";
 import { deleteAccountSchema, updateProfileSchema } from "@/schemas/profile";
 
 export async function GET(request: Request) {
@@ -12,53 +9,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: "Please sign in." }, { status: 401 });
   }
 
-  const userId = session.user.id;
-  const [[momentTotal], [firstMoment], [storedSettings]] = await Promise.all([
-    db
-      .select({ total: count() })
-      .from(moment)
-      .where(eq(moment.userId, userId)),
-    db
-      .select({ occurredOn: moment.occurredOn })
-      .from(moment)
-      .where(eq(moment.userId, userId))
-      .orderBy(asc(moment.occurredAt))
-      .limit(1),
-    db
-      .select({
-        onThisDay: userSettings.onThisDay,
-        onThisDayTime: userSettings.onThisDayTime,
-        weeklyRecap: userSettings.weeklyRecap,
-        blurPhotos: userSettings.blurPhotos,
-        discreetEmails: userSettings.discreetEmails,
-      })
-      .from(userSettings)
-      .where(eq(userSettings.userId, userId))
-      .limit(1),
-  ]);
-
-  const profileData: ProfileData = {
-    profile: {
-      name: session.user.name,
-      email: session.user.email,
-      imageUrl: session.user.image ?? null,
-      createdAt: session.user.createdAt,
-      momentCount: momentTotal?.total ?? 0,
-      firstMomentOn: firstMoment?.occurredOn ?? null,
-    },
-    settings: {
-      notifications: {
-        onThisDay: storedSettings?.onThisDay ?? true,
-        onThisDayTime: (storedSettings?.onThisDayTime ?? "08:00") as ProfileData["settings"]["notifications"]["onThisDayTime"],
-        weeklyRecap: storedSettings?.weeklyRecap ?? false,
-      },
-      privacy: {
-        blurPhotos: storedSettings?.blurPhotos ?? false,
-        discreetEmails: storedSettings?.discreetEmails ?? true,
-      },
-    },
-  };
-
+  const profileData = await getProfileData(session.user);
   return NextResponse.json(profileData);
 }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -9,7 +10,6 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { TextField } from "@/components/auth/text-field";
 import { updateProfile } from "@/features/profile/profile-api";
 import { GENERIC_ERROR, type ActionResult } from "@/features/profile/types";
-import { useProfileData } from "./profile-data-provider";
 import {
   AVATAR_TYPES,
   MAX_AVATAR_BYTES,
@@ -33,7 +33,7 @@ const secondaryButton =
  * previewed straight away from the file on this device.
  */
 export function EditProfileForm({ profile }: EditProfileFormProps) {
-  const { refreshProfile } = useProfileData();
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -125,7 +125,7 @@ export function EditProfileForm({ profile }: EditProfileFormProps) {
       setRemovePhoto(false);
       reset(values);
       toast.success("Profile updated");
-      await refreshProfile();
+      router.refresh();
     });
   }
 
