@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Camera, Loader2 } from "lucide-react";
+import { removeProfileAvatar, updateProfileAvatar } from "@/actions/profile-action";
 import { FormAlert } from "@/components/auth/form-alert";
 import { TextField } from "@/components/auth/text-field";
 import { updateProfile } from "@/features/profile/profile-api";
@@ -58,8 +59,13 @@ export function EditProfileForm({ profile }: EditProfileFormProps) {
   const shownImage = removePhoto ? null : (staged?.url ?? savedImage);
   const hasChanges = isDirty || staged !== null || removePhoto;
 
+  useEffect(() => {
+    return () => {
+      if (staged) URL.revokeObjectURL(staged.url);
+    };
+  }, [staged]);
+
   function discardStaged() {
-    if (staged) URL.revokeObjectURL(staged.url);
     setStaged(null);
   }
 
@@ -94,13 +100,6 @@ export function EditProfileForm({ profile }: EditProfileFormProps) {
   function onValid(values: UpdateProfileInput) {
     setFormError(null);
 
-    if (staged || removePhoto) {
-      setFormError(
-        "Profile photo storage is not configured yet. Discard the photo change before saving your details.",
-      );
-      return;
-    }
-
     startTransition(async () => {
       let result: ActionResult;
       try {
@@ -119,9 +118,41 @@ export function EditProfileForm({ profile }: EditProfileFormProps) {
         return;
       }
 
-      // Keep showing what was just saved. The preview URL moves over as the saved image.
-      setSavedImage(shownImage);
-      setStaged(null);
+      let nextImage = savedImage;
+      if (staged) {
+        const formData = new FormData();
+        formData.set("image", staged.file);
+        let avatarResult;
+        try {
+          avatarResult = await updateProfileAvatar(formData);
+        } catch {
+          setPhotoError(GENERIC_ERROR);
+          return;
+        }
+        if (!avatarResult.ok) {
+          setPhotoError(avatarResult.fieldErrors?.image ?? avatarResult.message);
+          return;
+        }
+        setPhotoError(null);
+        nextImage = avatarResult.imageUrl;
+      } else if (removePhoto) {
+        let avatarResult;
+        try {
+          avatarResult = await removeProfileAvatar();
+        } catch {
+          setFormError(GENERIC_ERROR);
+          return;
+        }
+        if (!avatarResult.ok) {
+          setFormError(avatarResult.message);
+          return;
+        }
+        setPhotoError(null);
+        nextImage = avatarResult.imageUrl;
+      }
+
+      setSavedImage(nextImage);
+      discardStaged();
       setRemovePhoto(false);
       reset(values);
       toast.success("Profile updated");

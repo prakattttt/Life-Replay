@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/app/lib/utils";
 
 type ProfileAvatarProps = {
@@ -24,15 +25,19 @@ export function ProfileAvatar({ name, imageUrl, size = "md", className }: Profil
   return (
     <span
       className={cn(
-        "grid shrink-0 place-items-center overflow-hidden rounded-full bg-teal-light font-bold text-teal ring-4 ring-background-secondary",
+        "relative grid shrink-0 place-items-center overflow-hidden rounded-full bg-teal-light font-bold text-teal ring-4 ring-background-secondary",
         sizes[size],
         className,
       )}
     >
       {imageUrl ? (
-        // Decorative: the name is right beside it. Swap for next/image once Cloudinary is set up.
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={imageUrl} alt="" className="size-full object-cover" />
+        <Image
+          src={imageUrl}
+          alt=""
+          fill
+          sizes={size === "md" ? "48px" : "(min-width: 768px) 96px, 80px"}
+          className="object-cover"
+        />
       ) : (
         <span aria-hidden>{initials}</span>
       )}

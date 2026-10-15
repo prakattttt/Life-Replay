@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { configureCloudinary } from "@/app/lib/cloudinary";
 import { getSessionUserId } from "@/features/auth/session";
 import { insertMoment } from "@/features/moments/mutations";
-import { createMomentSchema } from "@/schemas/moment";
+import { createMomentSchema, validateImageFile } from "@/schemas/moment";
 
 export type CreateMomentField =
   | "title"
@@ -59,11 +60,19 @@ export async function createMoment(formData: FormData): Promise<CreateMomentResu
     return { ok: false, message: "Please check the highlighted fields.", fieldErrors };
   }
 
-  // Images need a configured storage provider before they can be saved.
   const rawImage = formData.get("image");
-  if (rawImage instanceof File && rawImage.size > 0) {
-    const message = "Photo storage isn’t configured yet. Remove the photo to save this moment.";
-    return { ok: false, message, fieldErrors: { image: message } };
+  let imageFile: File | null = null;
+  if (rawImage !== null) {
+    if (!(rawImage instanceof File)) {
+      const message = "Choose a valid photo file.";
+      return { ok: false, message, fieldErrors: { image: message } };
+    }
+
+    const imageError = validateImageFile(rawImage);
+    if (imageError) {
+      return { ok: false, message: imageError, fieldErrors: { image: imageError } };
+    }
+    imageFile = rawImage;
   }
 
   const timezone = text(formData, "timezone") || "UTC";
@@ -71,6 +80,26 @@ export async function createMoment(formData: FormData): Promise<CreateMomentResu
     new Intl.DateTimeFormat("en-US", { timeZone: timezone });
   } catch {
     return { ok: false, message: "Choose a valid timezone." };
+  }
+
+  let uploadedImage: { imageUrl: string; imagePublicId: string } | null = null;
+  if (imageFile) {
+    try {
+      const bytes = Buffer.from(await imageFile.arrayBuffer());
+      const dataUri = `data:${imageFile.type};base64,${bytes.toString("base64")}`;
+      const result = await configureCloudinary().uploader.upload(dataUri, {
+        folder: "life-replay/moments",
+        resource_type: "image",
+      });
+      uploadedImage = {
+        imageUrl: result.secure_url,
+        imagePublicId: result.public_id,
+      };
+    } catch (error) {
+      console.error("moment image upload failed", error);
+      const message = "We couldn’t upload that photo. Please try again.";
+      return { ok: false, message, fieldErrors: { image: message } };
+    }
   }
 
   // A new moment is always owned by the session user.
@@ -82,12 +111,29 @@ export async function createMoment(formData: FormData): Promise<CreateMomentResu
       category,
       occurredAt: new Date(occurredAt),
       timezone,
+      imageUrl: uploadedImage?.imageUrl ?? null,
+      imagePublicId: uploadedImage?.imagePublicId ?? null,
     });
 
     revalidatePath("/dashboard");
     revalidatePath("/timeline");
+    revalidatePath("/moments");
     return { ok: true, id, occurredAt };
   } catch (error) {
+    if (uploadedImage) {
+      try {
+        const result = await configureCloudinary().uploader.destroy(
+          uploadedImage.imagePublicId,
+          { resource_type: "image", invalidate: true },
+        );
+        if (result.result !== "ok" && result.result !== "not found") {
+          throw new Error(`Cloudinary asset deletion failed: ${result.result}`);
+        }
+      } catch (cleanupError) {
+        console.error("failed to clean up moment image", cleanupError);
+      }
+    }
+
     // Details stay in the server log; the user gets a plain message.
     console.error("createMoment failed", error);
     return { ok: false, message: "We couldn’t save that moment. Please try again." };

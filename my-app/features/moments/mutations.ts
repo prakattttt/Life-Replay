@@ -8,6 +8,8 @@ export type NewMoment = {
   category: MomentCategory;
   occurredAt: Date;
   timezone: string;
+  imageUrl: string | null;
+  imagePublicId: string | null;
 };
 
 function calendarDate(date: Date, timezone: string): string {
@@ -44,6 +46,8 @@ export async function insertMoment(
         occurredAt: input.occurredAt,
         timezone: input.timezone,
         occurredOn: calendarDate(input.occurredAt, input.timezone),
+        imageUrl: input.imageUrl,
+        imagePublicId: input.imagePublicId,
       })
       .returning({ id: moment.id });
 
