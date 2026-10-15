@@ -1,7 +1,3 @@
-"use client";
-
-import axios from "axios";
-import { useEffect, useState } from "react";
 import { GreetingHeader } from "@/components/dashboard/greeting-header";
 import { OnThisDayBanner } from "@/components/dashboard/on-this-day-banner";
 import { QuickCaptureBar } from "@/components/dashboard/quick-capture-bar";
@@ -9,14 +5,7 @@ import { RecentMemories } from "@/components/dashboard/recent-memories";
 import { TodaysMoments } from "@/components/dashboard/todays-moments";
 import { FadeIn } from "@/components/ui/fade-in";
 import { getPromptOfTheDay } from "@/features/home/greeting";
-import { deserializeHomeData, type SerializedHomeData } from "@/features/home/transport";
 import type { HomeData } from "@/features/home/queries";
-import { apiClient } from "@/lib/api-client";
-
-type LoadState =
-  | { status: "loading" }
-  | { status: "error"; message: string }
-  | { status: "ready"; data: HomeData };
 
 function DashboardSkeletonBlock({ className }: { className: string }) {
   return (
@@ -26,7 +15,7 @@ function DashboardSkeletonBlock({ className }: { className: string }) {
   );
 }
 
-function DashboardSkeleton() {
+export function DashboardSkeleton() {
   return (
     <div className="mx-auto flex w-full max-w-242.5 flex-col gap-10 px-4 pb-28 pt-6 md:gap-12 md:px-8 md:pb-16 md:pt-10 xl:px-10">
       <div role="status" aria-label="Loading your archive" className="flex flex-col gap-10 md:gap-12">
@@ -111,56 +100,15 @@ function DashboardSkeleton() {
   );
 }
 
-export function DashboardContent({ name, now }: { name: string; now: Date }) {
-  const [attempt, setAttempt] = useState(0);
-  const [state, setState] = useState<LoadState>({ status: "loading" });
-
-  useEffect(() => {
-    const controller = new AbortController();
-    apiClient
-      .get<SerializedHomeData>("/api/home", { signal: controller.signal })
-      .then(({ data }) => data)
-      .then((data) => setState({ status: "ready", data: deserializeHomeData(data) }))
-      .catch((error: unknown) => {
-        if (controller.signal.aborted) return;
-        setState({
-          status: "error",
-          message:
-            axios.isAxiosError(error) && error.response
-              ? "We couldn’t load your archive."
-              : error instanceof Error
-                ? error.message
-                : "We couldn’t load your archive.",
-        });
-      });
-
-    return () => controller.abort();
-  }, [attempt]);
-
-  if (state.status === "loading") {
-    return <DashboardSkeleton />;
-  }
-
-  if (state.status === "error") {
-    return (
-      <div role="alert" className="mx-auto flex w-full max-w-242.5 flex-col items-start gap-3 px-4 py-12">
-        <p className="text-sm text-error">{state.message}</p>
-        <button
-          type="button"
-          onClick={() => {
-            setState({ status: "loading" });
-            setAttempt((value) => value + 1);
-          }}
-          className="min-h-11 rounded-lg font-semibold text-teal underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
-        >
-          Try again
-        </button>
-      </div>
-    );
-  }
-
-  const { data } = state;
-
+export function DashboardContent({
+  name,
+  now,
+  data,
+}: {
+  name: string;
+  now: Date;
+  data: HomeData;
+}) {
   return (
     <div className="relative isolate overflow-clip">
       <div
