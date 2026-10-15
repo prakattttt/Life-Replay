@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { and, desc, eq, ne } from "drizzle-orm";
+import { Pencil } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { CategoryBadge } from "@/components/moments/category-badge";
 import { categoryMeta } from "@/components/moments/category";
+import { DeleteMomentButton } from "@/components/moments/delete-moment-button";
 import { MomentCard } from "@/components/moments/moment-card";
 import { MomentImage } from "@/components/moments/moment-image";
 import { moment } from "@/app/db/schema";
@@ -73,12 +75,22 @@ export default async function MomentPage({ params }: MomentPageProps) {
         >
           Moments archive
         </Link>
-        <Link
-          href={timelineHref}
-          className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-foreground-secondary transition-colors hover:bg-background-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
-        >
-          View in timeline
-        </Link>
+        <div className="flex flex-wrap items-center gap-1">
+          <Link
+            href={timelineHref}
+            className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-foreground-secondary transition-colors hover:bg-background-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
+          >
+            View in timeline
+          </Link>
+          <Link
+            href={`/moments/${entry.id}/edit`}
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-semibold text-teal transition-colors hover:bg-teal-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
+          >
+            <Pencil className="size-4" aria-hidden />
+            Edit
+          </Link>
+          <DeleteMomentButton momentId={entry.id} title={entry.title} />
+        </div>
       </nav>
 
       <article className="flex flex-col gap-6">
@@ -103,7 +115,7 @@ export default async function MomentPage({ params }: MomentPageProps) {
         )}
 
         {entry.description && (
-          <p className="max-w-3xl whitespace-pre-wrap pl-5 text-base leading-8 text-foreground-secondary md:pl-8 md:text-lg">
+          <p className="min-w-0 max-w-3xl whitespace-pre-wrap wrap-anywhere pl-5 text-justify leading-8 text-foreground-secondary md:pl-8 md:text-lg">
             {entry.description}
           </p>
         )}

@@ -11,7 +11,7 @@ export function MomentCard({ moment }: { moment: Moment }) {
   }).format(moment.occurredAt);
 
   return (
-    <article className="group relative flex flex-col gap-4 rounded-xl border border-border bg-surface p-6 shadow-subtle transition-colors focus-within:ring-2 focus-within:ring-teal/40 hover:border-border-strong">
+    <article className="group relative flex min-w-0 flex-col gap-4 rounded-xl border border-border bg-surface p-6 shadow-subtle transition-colors focus-within:ring-2 focus-within:ring-teal/40 hover:border-border-strong">
       {moment.imageUrl && (
         <div className="relative aspect-video overflow-hidden rounded-lg">
           <MomentImage
@@ -32,7 +32,7 @@ export function MomentCard({ moment }: { moment: Moment }) {
         </time>
       </div>
 
-      <h3 className="text-[19px] font-bold leading-snug text-foreground">
+      <h3 className="min-w-0 wrap-anywhere text-[19px] font-bold leading-snug text-foreground">
         {/* Stretched link: the whole card is clickable, one tab stop. */}
         <Link
           href={`/moments/${moment.id}`}
@@ -43,7 +43,7 @@ export function MomentCard({ moment }: { moment: Moment }) {
       </h3>
 
       {moment.description && (
-        <p className="line-clamp-3 text-sm leading-relaxed text-foreground-secondary">
+        <p className="min-w-0 wrap-anywhere line-clamp-3 text-sm leading-relaxed text-foreground-secondary">
           {moment.description}
         </p>
       )}
