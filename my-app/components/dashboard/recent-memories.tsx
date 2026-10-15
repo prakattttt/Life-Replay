@@ -1,16 +1,22 @@
 import Link from "next/link";
-import { format } from "date-fns";
 import { TimelineEntry } from "@/components/dashboard/timeline-entry";
 import type { Moment } from "@/types/moment";
 
 export function RecentMemories({
   moments,
   now,
+  timezone,
 }: {
   moments: Moment[];
   now: Date;
+  timezone: string;
 }) {
   if (moments.length === 0) return null;
+  const monthLabel = new Intl.DateTimeFormat(undefined, {
+    month: "long",
+    year: "numeric",
+    timeZone: timezone,
+  }).format(now);
 
   return (
     <section
@@ -25,7 +31,7 @@ export function RecentMemories({
           Recent Memories
         </h2>
         <p className="text-[13px] text-foreground-secondary">
-          Chronological trail • {format(now, "MMMM yyyy")}
+          Chronological trail • {monthLabel}
         </p>
       </div>
 

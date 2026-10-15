@@ -3,14 +3,21 @@ import { ArrowRight, CalendarHeart } from "lucide-react";
 import { format } from "date-fns";
 import { CategoryBadge } from "@/components/moments/category-badge";
 import { MomentImage } from "@/components/moments/moment-image";
-import type { HomeData } from "@/features/home/mock-data";
+import type { HomeData } from "@/features/home/queries";
 
 type OnThisDayBannerProps = {
   data: HomeData["onThisDay"];
   now: Date;
+  timezone: string;
 };
 
-export function OnThisDayBanner({ data, now }: OnThisDayBannerProps) {
+export function OnThisDayBanner({ data, now, timezone }: OnThisDayBannerProps) {
+  const todayLabel = new Intl.DateTimeFormat(undefined, {
+    month: "long",
+    day: "numeric",
+    timeZone: timezone,
+  }).format(now);
+
   if (!data) {
     return (
       <section
@@ -25,7 +32,7 @@ export function OnThisDayBanner({ data, now }: OnThisDayBannerProps) {
           On This Day
         </h2>
         <p className="max-w-md text-sm leading-relaxed text-foreground-secondary">
-          Nothing from {format(now, "MMMM d")} yet. Keep capturing small
+          Nothing from {todayLabel} yet. Keep capturing small
           moments, and next year this spot will bring today back to you.
         </p>
       </section>
@@ -33,6 +40,20 @@ export function OnThisDayBanner({ data, now }: OnThisDayBannerProps) {
   }
 
   const { moment, yearsAgo, momentsThatDay } = data;
+  const momentDate = moment.occurredOn
+    ? new Date(`${moment.occurredOn}T12:00:00`)
+    : moment.occurredAt;
+  const historicalDateLabel = new Intl.DateTimeFormat(undefined, {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${moment.occurredOn}T12:00:00Z`));
+  const historicalTimeLabel = new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: moment.timezone ?? timezone,
+  }).format(moment.occurredAt);
 
   return (
     <section
@@ -48,13 +69,13 @@ export function OnThisDayBanner({ data, now }: OnThisDayBannerProps) {
             On this day • {format(now, "MMM d")}
           </h2>
           <p className="text-[11px] font-bold uppercase tracking-widest text-foreground-muted">
-            Resurfaced from {format(moment.occurredAt, "yyyy")}
+            Resurfaced from {format(momentDate, "yyyy")}
           </p>
         </div>
 
         <div className="flex flex-col gap-3">
           <p className="text-sm font-bold text-amber-dark">
-            {format(moment.occurredAt, "MMMM d, yyyy")} • Exactly {yearsAgo}{" "}
+            {historicalDateLabel} • Exactly {yearsAgo}{" "}
             {yearsAgo === 1 ? "year" : "years"} ago today
           </p>
           <blockquote className="text-balance text-xl font-bold leading-snug text-foreground md:text-[28px]">
@@ -71,7 +92,7 @@ export function OnThisDayBanner({ data, now }: OnThisDayBannerProps) {
           <CategoryBadge category={moment.category} />
           <span aria-hidden>•</span>
           <time dateTime={moment.occurredAt.toISOString()}>
-            {format(moment.occurredAt, "h:mm a")}
+            {historicalTimeLabel}
           </time>
         </div>
 

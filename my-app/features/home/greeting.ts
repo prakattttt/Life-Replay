@@ -6,8 +6,16 @@ export type DayPeriod = "morning" | "afternoon" | "evening" | "night";
  * NOTE: uses the server's timezone. Once user settings exist, pass a
  * date already shifted to the user's timezone.
  */
-export function getDayPeriod(date: Date): DayPeriod {
-  const hour = date.getHours();
+export function getDayPeriod(date: Date, timezone?: string): DayPeriod {
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      hourCycle: "h23",
+      ...(timezone ? { timeZone: timezone } : {}),
+    })
+      .formatToParts(date)
+      .find(({ type }) => type === "hour")?.value,
+  );
   if (hour < 5) return "night";
   if (hour < 12) return "morning";
   if (hour < 17) return "afternoon";
@@ -15,8 +23,8 @@ export function getDayPeriod(date: Date): DayPeriod {
   return "night";
 }
 
-export function getGreeting(date: Date): string {
-  const period = getDayPeriod(date);
+export function getGreeting(date: Date, timezone?: string): string {
+  const period = getDayPeriod(date, timezone);
   return `Good ${period === "night" ? "evening" : period}`;
 }
 

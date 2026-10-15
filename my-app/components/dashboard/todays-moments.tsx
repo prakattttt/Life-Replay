@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { format } from "date-fns";
 import { CAPTURE_HREF } from "@/components/layout/nav-items";
 import { MomentCard } from "@/components/moments/moment-card";
 import type { Moment } from "@/types/moment";
@@ -7,10 +6,18 @@ import type { Moment } from "@/types/moment";
 export function TodaysMoments({
   moments,
   now,
+  timezone,
 }: {
   moments: Moment[];
   now: Date;
+  timezone: string;
 }) {
+  const dateLabel = new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: timezone,
+  }).format(now);
   return (
     <section
       aria-labelledby="todays-moments-heading"
@@ -25,7 +32,7 @@ export function TodaysMoments({
             Today’s Moments
           </h2>
           <span className="hidden text-xs font-bold uppercase tracking-widest text-foreground-muted sm:inline">
-            {format(now, "MMM d, yyyy")}
+            {dateLabel}
           </span>
         </div>
         <p className="text-[13px] text-foreground-secondary">
