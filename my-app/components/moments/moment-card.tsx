@@ -1,10 +1,15 @@
 import Link from "next/link";
-import { format } from "date-fns";
 import type { Moment } from "@/types/moment";
 import { CategoryBadge } from "./category-badge";
 import { MomentImage } from "./moment-image";
 
 export function MomentCard({ moment }: { moment: Moment }) {
+  const timeLabel = new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+    ...(moment.timezone ? { timeZone: moment.timezone } : {}),
+  }).format(moment.occurredAt);
+
   return (
     <article className="group relative flex flex-col gap-4 rounded-xl border border-border bg-surface p-6 shadow-subtle transition-colors focus-within:ring-2 focus-within:ring-teal/40 hover:border-border-strong">
       {moment.imageUrl && (
@@ -23,7 +28,7 @@ export function MomentCard({ moment }: { moment: Moment }) {
           dateTime={moment.occurredAt.toISOString()}
           className="text-xs font-bold text-foreground-muted"
         >
-          {format(moment.occurredAt, "h:mm a")}
+          {timeLabel}
         </time>
       </div>
 

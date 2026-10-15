@@ -15,6 +15,7 @@ import {
   type RawSearchParams,
 } from "@/features/timeline/params";
 import {
+  getTimelineTimezone,
   getTimelineFilterOptions,
   getTimelineMoments,
 } from "@/features/timeline/queries";
@@ -27,11 +28,21 @@ type TimelinePageProps = {
 };
 
 export default async function TimelinePage({ searchParams }: TimelinePageProps) {
-  const now = new Date();
-  const query = parseTimelineSearchParams(await searchParams, now);
-
   const userId = await getSessionUserId();
   if (!userId) redirect("/login");
+  const instant = new Date();
+  const timezone = await getTimelineTimezone(userId);
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).formatToParts(instant);
+  const localDate = Object.fromEntries(
+    parts.map(({ type, value }) => [type, Number(value)]),
+  );
+  const now = new Date(localDate.year, localDate.month - 1, localDate.day, 12);
+  const query = parseTimelineSearchParams(await searchParams, now);
 
   const [result, options] = await Promise.all([
     getTimelineMoments(userId, query, now),

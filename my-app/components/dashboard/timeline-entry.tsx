@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { format } from "date-fns";
 import { categoryMeta } from "@/components/moments/category";
 import { CategoryBadge } from "@/components/moments/category-badge";
 import { cn } from "@/app/lib/utils";
@@ -7,6 +6,18 @@ import type { Moment } from "@/types/moment";
 
 /** One row on the vertical timeline: a category-coloured node plus a card. */
 export function TimelineEntry({ moment }: { moment: Moment }) {
+  const dateLabel = new Intl.DateTimeFormat(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+    ...(moment.timezone ? { timeZone: moment.timezone } : {}),
+  }).format(moment.occurredAt);
+  const timeLabel = new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+    ...(moment.timezone ? { timeZone: moment.timezone } : {}),
+  }).format(moment.occurredAt);
+
   return (
     <li className="relative pl-8 md:pl-10">
       <span
@@ -23,13 +34,13 @@ export function TimelineEntry({ moment }: { moment: Moment }) {
             dateTime={moment.occurredAt.toISOString()}
             className="text-[15px] font-bold uppercase text-amber-dark"
           >
-            {format(moment.occurredAt, "EEEE, MMM d")}
+            {dateLabel}
           </time>
           <span aria-hidden className="text-foreground-muted">
             •
           </span>
           <span className="text-[13px] text-foreground-secondary">
-            {format(moment.occurredAt, "h:mm a")}
+            {timeLabel}
           </span>
           <CategoryBadge category={moment.category} className="ml-auto" />
         </div>

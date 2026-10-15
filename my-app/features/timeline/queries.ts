@@ -1,5 +1,5 @@
 import { and, count, desc, eq, gte, lt, sql } from "drizzle-orm";
-import { moment } from "@/app/db/schema";
+import { moment, userSettings } from "@/app/db/schema";
 import { db } from "@/app/lib/db";
 import type { Moment } from "@/types/moment";
 import { TIMELINE_PAGE_SIZE, type TimelineQuery } from "./params";
@@ -12,6 +12,15 @@ export type TimelineMomentsResult = {
   /** How many older moments the next "load more" will add. */
   nextBatchSize: number;
 };
+
+export async function getTimelineTimezone(userId: string): Promise<string> {
+  const [settings] = await db
+    .select({ timezone: userSettings.timezone })
+    .from(userSettings)
+    .where(eq(userSettings.userId, userId))
+    .limit(1);
+  return settings?.timezone ?? "UTC";
+}
 
 export async function getTimelineMoments(
   userId: string,
