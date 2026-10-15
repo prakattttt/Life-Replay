@@ -2,14 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Loader2, MailCheck } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import { FormAlert } from "@/components/auth/form-alert";
-import {
-  GENERIC_ERROR,
-  requestDataExport,
-  type ActionResult,
-  type ExportFormat,
-} from "@/features/profile/profile-actions";
+import { downloadDataExport } from "@/features/profile/profile-api";
+import { GENERIC_ERROR, type ActionResult, type ExportFormat } from "@/features/profile/types";
 import { cn } from "@/app/lib/utils";
 
 const formats: { value: ExportFormat; label: string; hint: string }[] = [
@@ -18,10 +14,9 @@ const formats: { value: ExportFormat; label: string; hint: string }[] = [
 ];
 
 /**
- * Asks for a copy of everything. Exports can take a while, so the confirmation
- * says it will arrive by email rather than promising an instant download.
+ * Downloads the selected archive format from the authenticated export endpoint.
  */
-export function DataExport({ email }: { email: string }) {
+export function DataExport() {
   const [isPending, startTransition] = useTransition();
   const [format, setFormat] = useState<ExportFormat>("json");
   const [includePhotos, setIncludePhotos] = useState(true);
@@ -34,7 +29,7 @@ export function DataExport({ email }: { email: string }) {
     startTransition(async () => {
       let result: ActionResult;
       try {
-        result = await requestDataExport({ format, includePhotos });
+        result = await downloadDataExport({ format, includePhotos });
       } catch {
         setError(GENERIC_ERROR);
         return;
@@ -45,7 +40,7 @@ export function DataExport({ email }: { email: string }) {
         return;
       }
       setRequested(true);
-      toast.success("Export requested");
+      toast.success("Export downloaded");
     });
   }
 
@@ -53,14 +48,12 @@ export function DataExport({ email }: { email: string }) {
     return (
       <div className="flex flex-col gap-4 rounded-xl bg-teal-subtle p-5 sm:flex-row sm:items-center">
         <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-surface text-teal">
-          <MailCheck className="size-6" aria-hidden />
+          <Download className="size-6" aria-hidden />
         </span>
         <div role="status" className="flex flex-1 flex-col gap-0.5">
-          <p className="font-bold text-foreground">Your export is on its way</p>
+          <p className="font-bold text-foreground">Your export is ready</p>
           <p className="text-sm leading-relaxed text-foreground-secondary">
-            We’ll email a download link to{" "}
-            <span className="break-all font-semibold text-foreground">{email}</span> when it’s
-            ready.
+            A copy of your archive has been downloaded to this device.
           </p>
         </div>
         <button
@@ -68,7 +61,7 @@ export function DataExport({ email }: { email: string }) {
           onClick={() => setRequested(false)}
           className="inline-flex min-h-11 items-center justify-center rounded-xl px-4 text-sm font-semibold text-teal hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
         >
-          Request another
+          Download another
         </button>
       </div>
     );
@@ -124,10 +117,10 @@ export function DataExport({ email }: { email: string }) {
           {isPending ? (
             <>
               <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden />
-              Requesting…
+              Preparing download…
             </>
           ) : (
-            "Request export"
+            "Download export"
           )}
         </button>
       </fieldset>

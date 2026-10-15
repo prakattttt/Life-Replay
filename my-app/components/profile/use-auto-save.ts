@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { GENERIC_ERROR, type ActionResult } from "@/features/profile/profile-actions";
+import { GENERIC_ERROR, type ActionResult } from "@/features/profile/types";
 
 /**
  * Instant-save behaviour for switches and selects: the screen updates at once,

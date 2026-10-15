@@ -11,6 +11,8 @@ interface IUser {
   name: string;
   imageUrl: string | null;
   email: string;
+  momentCount: number;
+  firstMomentOn: string | null;
 }
 
 export function ProfileHeader({ user }: { user: IUser }) {
@@ -18,12 +20,13 @@ export function ProfileHeader({ user }: { user: IUser }) {
     { label: "Member since", value: format(user.createdAt, "MMM yyyy") },
     {
       label: "Moments kept",
-      value: 123,
-    } /* user.momentCount.toLocaleString("en-US") */,
+      value: user.momentCount.toLocaleString("en-US"),
+    },
     {
       label: "First memory",
-      value:
-        new Date().toLocaleTimeString() /*user.firstMomentAt ? format(user.firstMomentAt, "MMM yyyy") : "Not yet", */,
+      value: user.firstMomentOn
+        ? format(new Date(`${user.firstMomentOn}T12:00:00`), "MMM yyyy")
+        : "Not yet",
     },
   ];
 

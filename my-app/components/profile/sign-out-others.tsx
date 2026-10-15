@@ -3,11 +3,8 @@
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { Loader2, MonitorSmartphone } from "lucide-react";
-import {
-  GENERIC_ERROR,
-  signOutOtherDevices,
-  type ActionResult,
-} from "@/features/profile/profile-actions";
+import { signOutOtherDevices } from "@/features/profile/profile-api";
+import { GENERIC_ERROR, type ActionResult } from "@/features/profile/types";
 
 /** Ends every session except this one. Handy after using a shared computer. */
 export function SignOutOthers() {

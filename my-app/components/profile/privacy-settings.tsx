@@ -1,8 +1,8 @@
 "use client";
 
 import { Lock } from "lucide-react";
-import { updateSettings } from "@/features/profile/profile-actions";
-import type { Settings } from "@/features/profile/mock-data";
+import { updateSettings } from "@/features/profile/profile-api";
+import type { Settings } from "@/features/profile/types";
 import { ToggleRow } from "./toggle-row";
 import { useAutoSave } from "./use-auto-save";
 

@@ -1,18 +1,15 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Camera, Loader2 } from "lucide-react";
 import { FormAlert } from "@/components/auth/form-alert";
 import { TextField } from "@/components/auth/text-field";
-import { updateUser } from "@/actions/auth-action";
-import {
-  GENERIC_ERROR,
-  type ActionResult,
-} from "@/features/profile/profile-actions";
+import { updateProfile } from "@/features/profile/profile-api";
+import { GENERIC_ERROR, type ActionResult } from "@/features/profile/types";
+import { useProfileData } from "./profile-data-provider";
 import {
   AVATAR_TYPES,
   MAX_AVATAR_BYTES,
@@ -36,7 +33,7 @@ const secondaryButton =
  * previewed straight away from the file on this device.
  */
 export function EditProfileForm({ profile }: EditProfileFormProps) {
-  const router = useRouter();
+  const { refreshProfile } = useProfileData();
   const [isPending, startTransition] = useTransition();
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -107,7 +104,7 @@ export function EditProfileForm({ profile }: EditProfileFormProps) {
     startTransition(async () => {
       let result: ActionResult;
       try {
-        result = await updateUser(values);
+        result = await updateProfile(values);
       } catch {
         setFormError(GENERIC_ERROR);
         return;
@@ -128,7 +125,7 @@ export function EditProfileForm({ profile }: EditProfileFormProps) {
       setRemovePhoto(false);
       reset(values);
       toast.success("Profile updated");
-      router.refresh();
+      await refreshProfile();
     });
   }
 

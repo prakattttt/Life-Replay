@@ -4,12 +4,10 @@ import { useId, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2, TriangleAlert, X } from "lucide-react";
-import {
-  GENERIC_ERROR,
-  deleteAccount,
-  type ActionResult,
-} from "@/features/profile/profile-actions";
+import { PasswordField } from "@/components/auth/password-field";
 import { FormAlert } from "@/components/auth/form-alert";
+import { deleteAccount } from "@/features/profile/profile-api";
+import { GENERIC_ERROR, type ActionResult } from "@/features/profile/types";
 
 const CONFIRM_WORD = "DELETE";
 
@@ -24,11 +22,12 @@ export function DeleteAccount() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [isPending, startTransition] = useTransition();
   const [typed, setTyped] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const titleId = useId();
   const inputId = useId();
-  const confirmed = typed.trim() === CONFIRM_WORD;
+  const confirmed = typed.trim() === CONFIRM_WORD && password.length > 0;
 
   function close() {
     if (isPending) return;
@@ -42,7 +41,7 @@ export function DeleteAccount() {
     startTransition(async () => {
       let result: ActionResult;
       try {
-        result = await deleteAccount();
+        result = await deleteAccount({ confirmation: CONFIRM_WORD, password });
       } catch {
         setError(GENERIC_ERROR);
         return;
@@ -87,6 +86,7 @@ export function DeleteAccount() {
         aria-labelledby={titleId}
         onClose={() => {
           setTyped("");
+          setPassword("");
           setError(null);
         }}
         onCancel={(event) => {
@@ -127,7 +127,7 @@ export function DeleteAccount() {
 
           <div className="flex flex-col gap-2">
             <label htmlFor={inputId} className="text-sm font-semibold text-foreground">
-              Type <span className="font-bold text-error">{CONFIRM_WORD}</span> to confirm
+              Type <span className="font-bold text-error">{CONFIRM_WORD}</span> and enter your password
             </label>
             <input
               id={inputId}
@@ -140,6 +140,14 @@ export function DeleteAccount() {
               className="min-h-12 w-full rounded-xl border border-border bg-surface px-4 text-base text-foreground transition-colors focus:border-error focus:outline-none focus:ring-2 focus:ring-error/30 disabled:opacity-60"
             />
           </div>
+
+          <PasswordField
+            label="Current password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            disabled={isPending}
+          />
 
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button

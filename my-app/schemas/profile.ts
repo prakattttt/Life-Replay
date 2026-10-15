@@ -41,6 +41,38 @@ export const changePasswordSchema = z
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 
+const notificationSettingsSchema = z.object({
+  onThisDay: z.boolean().optional(),
+  onThisDayTime: z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/).optional(),
+  weeklyRecap: z.boolean().optional(),
+});
+
+const privacySettingsSchema = z.object({
+  blurPhotos: z.boolean().optional(),
+  discreetEmails: z.boolean().optional(),
+});
+
+export const settingsPatchSchema = z
+  .object({
+    notifications: notificationSettingsSchema.optional(),
+    privacy: privacySettingsSchema.optional(),
+  })
+  .refine((settings) => Object.keys(settings).length > 0, {
+    message: "Choose at least one setting to update.",
+  });
+
+export type SettingsPatch = z.infer<typeof settingsPatchSchema>;
+
+export const exportRequestSchema = z.object({
+  format: z.enum(["json", "csv"]),
+  includePhotos: z.boolean(),
+});
+
+export const deleteAccountSchema = z.object({
+  confirmation: z.literal("DELETE"),
+  password: z.string().min(1, "Enter your password to confirm."),
+});
+
 /** Profile photo rules (client-side hint; check again on the server). */
 export const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 export const MAX_AVATAR_BYTES = 4 * 1024 * 1024;

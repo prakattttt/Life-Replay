@@ -8,11 +8,8 @@ import { FormAlert } from "@/components/auth/form-alert";
 import { PasswordField } from "@/components/auth/password-field";
 import { PasswordStrength } from "@/components/auth/password-strength";
 import { SubmitButton } from "@/components/auth/submit-button";
-import {
-  GENERIC_ERROR,
-  changePassword,
-  type ActionResult,
-} from "@/features/profile/profile-actions";
+import { changePassword } from "@/features/profile/profile-api";
+import { GENERIC_ERROR, type ActionResult } from "@/features/profile/types";
 import { changePasswordSchema, type ChangePasswordInput } from "@/schemas/profile";
 
 const EMPTY: ChangePasswordInput = { currentPassword: "", newPassword: "", confirmPassword: "" };

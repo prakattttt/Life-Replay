@@ -1,12 +1,12 @@
 "use client";
 
 import { useId } from "react";
-import { updateSettings } from "@/features/profile/profile-actions";
+import { updateSettings } from "@/features/profile/profile-api";
 import {
   NOTIFICATION_TIMES,
   type NotificationTime,
   type Settings,
-} from "@/features/profile/mock-data";
+} from "@/features/profile/types";
 import { ToggleRow } from "./toggle-row";
 import { useAutoSave } from "./use-auto-save";
 

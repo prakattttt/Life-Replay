@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, LogOut } from "lucide-react";
 import { cn } from "@/app/lib/utils";
-import { signOut } from "@/actions/auth-action";
-import { GENERIC_ERROR } from "@/features/profile/profile-actions";
+import { signOutSession } from "@/features/profile/profile-api";
+import { GENERIC_ERROR } from "@/features/profile/types";
 
 export function SignOutButton({ className }: { className?: string }) {
   const router = useRouter();
@@ -15,7 +15,7 @@ export function SignOutButton({ className }: { className?: string }) {
   function handleClick() {
     startTransition(async () => {
       try {
-        const result = await signOut();
+        const result = await signOutSession();
         if (!result.ok) {
           toast.error(result.message);
           return;
