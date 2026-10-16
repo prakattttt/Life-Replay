@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { GENERIC_ERROR, type ActionResult } from "@/features/profile/types";
 
@@ -15,26 +15,43 @@ export function useAutoSave<T extends object>(
 ) {
   const [values, setValues] = useState(initial);
   const [isPending, startTransition] = useTransition();
+  const valuesRef = useRef(initial);
+  const savedRef = useRef(initial);
+  const queueRef = useRef<Promise<void>>(Promise.resolve());
 
   function change(patch: Partial<T>) {
-    const previous = values;
-    setValues({ ...values, ...patch });
+    const optimistic = { ...valuesRef.current, ...patch };
+    valuesRef.current = optimistic;
+    setValues(optimistic);
 
     startTransition(async () => {
-      let result: ActionResult;
-      try {
-        result = await save(patch);
-      } catch {
-        result = { ok: false, message: GENERIC_ERROR };
-      }
+      const queuedSave = queueRef.current.then(async () => {
+        let result: ActionResult;
+        try {
+          result = await save(patch);
+        } catch {
+          result = { ok: false, message: GENERIC_ERROR };
+        }
 
-      if (!result.ok) {
-        setValues(previous);
-        toast.error(result.message, { id: "settings-saved" });
-        return;
-      }
-      // One shared id: rapid changes replace the toast instead of stacking them.
-      toast.success("Settings updated", { id: "settings-saved" });
+        if (!result.ok) {
+          const current = valuesRef.current;
+          const reverted = { ...current };
+          for (const key of Object.keys(patch) as (keyof T)[]) {
+            if (Object.is(current[key], optimistic[key])) {
+              Object.assign(reverted, { [key]: savedRef.current[key] });
+            }
+          }
+          valuesRef.current = reverted;
+          setValues(reverted);
+          toast.error(result.message, { id: "settings-saved" });
+          return;
+        }
+
+        savedRef.current = { ...savedRef.current, ...patch };
+        toast.success("Settings updated", { id: "settings-saved" });
+      });
+      queueRef.current = queuedSave;
+      await queuedSave;
     });
   }
 

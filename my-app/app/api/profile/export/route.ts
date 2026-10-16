@@ -6,7 +6,9 @@ import { auth } from "@/app/lib/auth";
 import { exportRequestSchema } from "@/schemas/profile";
 
 function csvCell(value: string | null): string {
-  return `"${(value ?? "").replaceAll('"', '""')}"`;
+  const text = value ?? "";
+  const safeText = /^[\s\u0000-\u001f]*[=+\-@]/.test(text) ? `'${text}` : text;
+  return `"${safeText.replaceAll('"', '""')}"`;
 }
 
 export async function POST(request: Request) {
@@ -73,6 +75,7 @@ export async function POST(request: Request) {
           profile: {
             name: session.user.name,
             email: session.user.email,
+            imageUrl: parsed.data.includePhotos ? session.user.image ?? null : null,
             createdAt: session.user.createdAt,
           },
           settings: settings ?? null,

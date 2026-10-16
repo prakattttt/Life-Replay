@@ -1,13 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
 import { Lock } from "lucide-react";
 import { updateSettings } from "@/features/profile/profile-api";
 import type { Settings } from "@/features/profile/types";
+import { usePhotoPrivacy } from "@/components/providers/photo-privacy-provider";
 import { ToggleRow } from "./toggle-row";
 import { useAutoSave } from "./use-auto-save";
 
 export function PrivacySettings({ initial }: { initial: Settings["privacy"] }) {
-  const { values, change } = useAutoSave(initial, (patch) => updateSettings({ privacy: patch }));
+  const { values, change, isPending } = useAutoSave(initial, (patch) => updateSettings({ privacy: patch }));
+  const { setBlurPhotos } = usePhotoPrivacy();
+
+  useEffect(() => {
+    setBlurPhotos(values.blurPhotos);
+  }, [setBlurPhotos, values.blurPhotos]);
 
   return (
     <div>
@@ -17,6 +24,7 @@ export function PrivacySettings({ initial }: { initial: Settings["privacy"] }) {
           label="Blur photos until tapped"
           description="Keeps your photos private if someone glances at your screen."
           checked={values.blurPhotos}
+          disabled={isPending}
           onChange={(blurPhotos) => change({ blurPhotos })}
         />
         <ToggleRow
@@ -24,6 +32,7 @@ export function PrivacySettings({ initial }: { initial: Settings["privacy"] }) {
           label="Keep emails discreet"
           description="Reminders say you have memories from today, without showing what they say."
           checked={values.discreetEmails}
+          disabled={isPending}
           onChange={(discreetEmails) => change({ discreetEmails })}
         />
       </div>

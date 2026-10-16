@@ -77,8 +77,10 @@ export async function downloadDataExport(input: {
     anchor.href = objectUrl;
     anchor.download = response.headers["content-disposition"]
       ?.match(/filename="([^"]+)"/)?.[1] ?? `life-replay-export.${input.format}`;
+    document.body.append(anchor);
     anchor.click();
-    URL.revokeObjectURL(objectUrl);
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
     return { ok: true };
   } catch (error) {
     if (!axios.isAxiosError(error) || !error.response) throw error;

@@ -103,7 +103,7 @@ export function DataExport() {
           />
           <span>
             Include photos
-            <span className="block text-foreground-secondary">Makes the download larger.</span>
+            <span className="block text-foreground-secondary">Adds photo links to the export.</span>
           </span>
         </label>
 

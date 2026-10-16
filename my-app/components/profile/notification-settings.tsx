@@ -30,6 +30,7 @@ export function NotificationSettings({ initial, email }: NotificationSettingsPro
           label="On This Day reminder"
           description="An email when a past year has a moment from today."
           checked={values.onThisDay}
+          disabled={isPending}
           onChange={(onThisDay) => change({ onThisDay })}
         />
 
@@ -59,6 +60,7 @@ export function NotificationSettings({ initial, email }: NotificationSettingsPro
           label="Weekly recap"
           description="A quiet look back at what you saved this week."
           checked={values.weeklyRecap}
+          disabled={isPending}
           onChange={(weeklyRecap) => change({ weeklyRecap })}
         />
       </div>
