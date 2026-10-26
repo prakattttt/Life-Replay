@@ -6,6 +6,7 @@ import type {
   LoginInput,
   RegisterInput,
 } from "@/schemas/auth";
+import { forgotPasswordSchema } from "@/schemas/auth";
 import {
   getErrorCode,
   getErrorMessage,
@@ -13,7 +14,11 @@ import {
   GENERIC_AUTH_ERROR,
 } from "@/features/auth/auth-helper";
 import { auth } from "@/app/lib/auth";
-import { updateProfileSchema, type UpdateProfileInput } from "@/schemas/profile";
+import { appUrl } from "@/app/lib/email";
+import {
+  updateProfileSchema,
+  type UpdateProfileInput,
+} from "@/schemas/profile";
 
 export async function signInWithEmail(input: LoginInput): Promise<AuthResult> {
   try {
@@ -43,6 +48,7 @@ export async function signUpWithEmail(
         name: input.name,
         email: input.email,
         password: input.password,
+        callbackURL: appUrl("/verify-email?verified=1"),
       },
     });
     return { ok: true };
@@ -80,12 +86,16 @@ export async function signOut(): Promise<AuthResult> {
   }
 }
 
-export async function updateUser(user: UpdateProfileInput): Promise<AuthResult> {
+export async function updateUser(
+  user: UpdateProfileInput,
+): Promise<AuthResult> {
   const parsed = updateProfileSchema.safeParse(user);
   if (!parsed.success) {
     const issues = parsed.error.issues;
     const nameError = issues.find((issue) => issue.path[0] === "name")?.message;
-    const emailError = issues.find((issue) => issue.path[0] === "email")?.message;
+    const emailError = issues.find(
+      (issue) => issue.path[0] === "email",
+    )?.message;
     return {
       ok: false,
       message: GENERIC_AUTH_ERROR,
@@ -100,7 +110,10 @@ export async function updateUser(user: UpdateProfileInput): Promise<AuthResult> 
     const requestHeaders = await headers();
     const session = await auth.api.getSession({ headers: requestHeaders });
     if (!session) {
-      return { ok: false, message: "Your session has expired. Please sign in again." };
+      return {
+        ok: false,
+        message: "Your session has expired. Please sign in again.",
+      };
     }
 
     if (parsed.data.email !== session.user.email.trim().toLowerCase()) {
@@ -108,7 +121,8 @@ export async function updateUser(user: UpdateProfileInput): Promise<AuthResult> 
         ok: false,
         message: "Email changes are not available yet.",
         fieldErrors: {
-          email: "Email changes require a verification flow that is not configured yet.",
+          email:
+            "Email changes require a verification flow that is not configured yet.",
         },
       };
     }
@@ -123,6 +137,38 @@ export async function updateUser(user: UpdateProfileInput): Promise<AuthResult> 
       ok: false,
       code: getErrorCode(error),
       message: GENERIC_AUTH_ERROR,
+    };
+  }
+}
+
+export async function resendVerificationEmail(email: string): Promise<AuthResult> {
+  const parsed = forgotPasswordSchema.safeParse({ email });
+  if (!parsed.success) {
+    return {
+      ok: false,
+      message: "Enter a valid email address.",
+      fieldErrors: { email: "Enter a valid email address." },
+    };
+  }
+
+  try {
+    await auth.api.sendVerificationEmail({
+      body: {
+        email: parsed.data.email,
+        callbackURL: appUrl("/verify-email?verified=1"),
+      },
+    });
+
+    return { ok: true };
+  } catch (error) {
+    console.error(
+      "Failed to resend verification email",
+      error instanceof Error ? error.message : "Unknown email error",
+    );
+    return {
+      ok: false,
+      code: getErrorCode(error),
+      message: "We couldn’t send a verification email. Please try again.",
     };
   }
 }

@@ -41,6 +41,7 @@ export function RegisterForm() {
 
     startTransition(async () => {
       let result: AuthResult;
+
       try {
         result = await signUpWithEmail(values);
       } catch {
@@ -50,19 +51,29 @@ export function RegisterForm() {
 
       if (!result.ok) {
         const fieldErrors = result.fieldErrors ?? {};
-        if (fieldErrors.name) setError("name", { message: fieldErrors.name });
-        if (fieldErrors.email)
-          setError("email", { message: fieldErrors.email });
-        if (fieldErrors.password)
-          setError("password", { message: fieldErrors.password });
 
-        if (Object.keys(fieldErrors).length === 0) setFormError(result.message);
+        if (fieldErrors.name) {
+          setError("name", { message: fieldErrors.name });
+        }
+
+        if (fieldErrors.email) {
+          setError("email", { message: fieldErrors.email });
+        }
+
+        if (fieldErrors.password) {
+          setError("password", { message: fieldErrors.password });
+        }
+
+        if (Object.keys(fieldErrors).length === 0) {
+          setFormError(result.message);
+        }
+
         return;
       }
 
-      router.push("/dashboard");
+      toast.success("Account created. Check your email to verify it.");
+      router.push("/verify-email");
       router.refresh();
-      toast.success("User registered successfully.");
     });
   }
 
