@@ -48,18 +48,6 @@ export function signOutOtherDevices(): Promise<ActionResult> {
   return sendJson("/api/profile/sessions", "DELETE");
 }
 
-export async function signOutSession(): Promise<ActionResult> {
-  try {
-    await apiClient.post("/api/auth/sign-out");
-    return { ok: true };
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      return { ok: false, message: "We couldn’t sign you out. Please try again." };
-    }
-    throw error;
-  }
-}
-
 export function deleteAccount(input: { confirmation: "DELETE"; password: string }): Promise<ActionResult> {
   return sendJson("/api/profile", "DELETE", input);
 }
