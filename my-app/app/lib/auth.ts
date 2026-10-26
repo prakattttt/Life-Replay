@@ -18,6 +18,19 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      const safeUrl = url
+        .replaceAll("&", "&amp;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+      await sendEmail({
+        to: user.email,
+        subject: "Reset your Life Replay password",
+        text: `Use this link to choose a new password. It expires in one hour:\n${url}`,
+        html: `Use this link to choose a new password. It expires in one hour: <a href="${safeUrl}">reset your password</a>.`,
+      });
+    },
   },
 
   user: {

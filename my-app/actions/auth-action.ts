@@ -180,7 +180,7 @@ export async function requestPasswordReset(
     await auth.api.requestPasswordReset({
       body: {
         email: input.email,
-        redirectTo: "/reset-password",
+        redirectTo: appUrl("/reset-password"),
       },
     });
     return { ok: true };
