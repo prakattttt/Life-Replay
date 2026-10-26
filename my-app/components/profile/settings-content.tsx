@@ -2,7 +2,7 @@
 
 import { AppearanceSettings } from "./appearance-settings";
 import { DataExport } from "./data-export";
-import { NotificationSettings } from "./notification-settings";
+// import { NotificationSettings } from "./notification-settings";
 import { PrivacySettings } from "./privacy-settings";
 import { SectionCard } from "./section-card";
 import { SettingsNav } from "./settings-nav";
@@ -35,13 +35,13 @@ export function SettingsContent() {
             <AppearanceSettings />
           </SectionCard>
 
-          <SectionCard
+          {/* <SectionCard
             id="notifications"
             title="Notifications"
             description="Gentle nudges, never noise. Turn off whatever you don’t want."
           >
-            <NotificationSettings initial={data.settings.notifications} email={data.profile.email} />
-          </SectionCard>
+            {/* <NotificationSettings initial={data.settings.notifications} email={data.profile.email} /> */}
+          {/* </SectionCard> */} 
 
           <SectionCard
             id="privacy"
