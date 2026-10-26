@@ -39,23 +39,30 @@ export async function PATCH(request: Request) {
     );
   }
 
-  if (parsed.data.email !== session.user.email.trim().toLowerCase()) {
-    return NextResponse.json(
-      {
-        ok: false,
-        message: "Email changes require a verification flow that is not configured yet.",
-        fieldErrors: { email: "Email changes are not available yet." },
-      },
-      { status: 400 },
-    );
-  }
-
   try {
+    const emailChanged =
+      parsed.data.email !== session.user.email.trim().toLowerCase();
+
+    if (emailChanged) {
+      await auth.api.changeEmail({
+        body: {
+          newEmail: parsed.data.email,
+          callbackURL: new URL("/profile", process.env.BETTER_AUTH_URL).toString(),
+        },
+        headers: request.headers,
+      });
+    }
+
     await auth.api.updateUser({
       body: { name: parsed.data.name },
       headers: request.headers,
     });
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      ok: true,
+      ...(emailChanged
+        ? { message: "Check your current email to confirm the address change." }
+        : {}),
+    });
   } catch {
     return NextResponse.json(
       { ok: false, message: "We couldn’t update your profile. Please try again." },

@@ -116,22 +116,29 @@ export async function updateUser(
       };
     }
 
-    if (parsed.data.email !== session.user.email.trim().toLowerCase()) {
-      return {
-        ok: false,
-        message: "Email changes are not available yet.",
-        fieldErrors: {
-          email:
-            "Email changes require a verification flow that is not configured yet.",
+    const emailChanged =
+      parsed.data.email !== session.user.email.trim().toLowerCase();
+
+    if (emailChanged) {
+      await auth.api.changeEmail({
+        body: {
+          newEmail: parsed.data.email,
+          callbackURL: appUrl("/profile"),
         },
-      };
+        headers: requestHeaders,
+      });
     }
 
     await auth.api.updateUser({
       body: { name: parsed.data.name },
       headers: requestHeaders,
     });
-    return { ok: true };
+    return {
+      ok: true,
+      ...(emailChanged
+        ? { message: "Check your current email to confirm the address change." }
+        : {}),
+    };
   } catch (error) {
     return {
       ok: false,

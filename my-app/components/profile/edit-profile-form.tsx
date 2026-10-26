@@ -155,7 +155,7 @@ export function EditProfileForm({ profile }: EditProfileFormProps) {
       discardStaged();
       setRemovePhoto(false);
       reset(values);
-      toast.success("Profile updated");
+      toast.success(result.message ?? "Profile updated");
       router.refresh();
     });
   }

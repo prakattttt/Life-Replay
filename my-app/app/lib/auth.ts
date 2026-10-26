@@ -37,6 +37,22 @@ export const auth = betterAuth({
     deleteUser: {
       enabled: true,
     },
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
+        const safeUrl = url
+          .replaceAll("&", "&amp;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;");
+        await sendEmail({
+          to: user.email,
+          subject: "Confirm your Life Replay email change",
+          text: `You requested to change your Life Replay email to ${newEmail}. Confirm this change:\n${url}`,
+          html: `You requested to change your Life Replay email to ${newEmail}. <a href="${safeUrl}">Confirm this change</a>.`,
+        });
+      },
+    },
   },
 
   emailVerification: {
