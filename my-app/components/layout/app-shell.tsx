@@ -2,6 +2,7 @@ import { MobileBottomNav } from "./mobile-bottom-nav";
 import { MobileHeader } from "./mobile-header";
 import { Sidebar } from "./sidebar";
 import { TopHeader } from "./top-header";
+import { PageTransition } from "@/components/ui/page-transition";
 
 type AppShellProps = {
   user: { name: string; email: string };
@@ -26,7 +27,7 @@ export function AppShell({ user, children }: AppShellProps) {
         <main
           id="main-content"
         >
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
       </div>
 

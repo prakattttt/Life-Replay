@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/layout/logo";
+import { PageTransition } from "@/components/ui/page-transition";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { BrandPanel } from "./brand-panel";
 
@@ -36,7 +37,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
           id="main-content"
           className="mx-auto flex w-full max-w-[26.5rem] flex-1 flex-col justify-center gap-8 px-4 pb-12 pt-4 md:px-0 md:pb-20"
         >
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
       </div>
     </div>

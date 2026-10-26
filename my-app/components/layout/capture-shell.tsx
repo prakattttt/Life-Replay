@@ -1,5 +1,6 @@
 import { Sidebar } from "./sidebar";
 import { TopHeader } from "./top-header";
+import { PageTransition } from "@/components/ui/page-transition";
 
 type CaptureShellProps = {
   user: { name: string; email: string };
@@ -27,7 +28,7 @@ export function CaptureShell({ user, children }: CaptureShellProps) {
       <div className="md:pl-18 xl:pl-57.5">
         <TopHeader />
         <main id="main-content" className="px-4 pb-0 md:px-8 md:pb-16 md:pt-10 xl:px-10">
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
       </div>
     </div>
