@@ -13,8 +13,8 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: process.env.NEXT_PUBLIC_SITE_URL
-    ? new URL(process.env.NEXT_PUBLIC_SITE_URL)
+  metadataBase: process.env.SITE_URL
+    ? new URL(process.env.SITE_URL)
     : undefined,
   title: {
     default: "Life Replay",
