@@ -13,10 +13,40 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Life Replay",
-
+  metadataBase: process.env.NEXT_PUBLIC_SITE_URL
+    ? new URL(process.env.NEXT_PUBLIC_SITE_URL)
+    : undefined,
+  title: {
+    default: "Life Replay",
+    template: "%s | Life Replay",
+  },
+  applicationName: "Life Replay",
   description:
-    "Capture everyday moments and rediscover memories from the past with your personal time machine.",
+    "A private archive for capturing everyday moments and rediscovering memories over time.",
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+      noarchive: true,
+      nosnippet: true,
+    },
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Life Replay",
+    title: "Life Replay",
+    description:
+      "A private archive for capturing everyday moments and rediscovering memories over time.",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary",
+    title: "Life Replay",
+    description:
+      "A private archive for capturing everyday moments and rediscovering memories over time.",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

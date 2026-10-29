@@ -4,7 +4,10 @@ import { DeleteAccount } from "@/components/profile/delete-account";
 import { SectionCard } from "@/components/profile/section-card";
 import { SignOutOthers } from "@/components/profile/sign-out-others";
 
-export const metadata: Metadata = { title: "Security · Life Replay" };
+export const metadata: Metadata = {
+  title: "Security",
+  description: "Manage your password and signed-in sessions.",
+};
 
 export default function SecurityPage() {
   return (

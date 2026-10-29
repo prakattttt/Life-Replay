@@ -5,7 +5,10 @@ import { AuthShell } from "@/components/auth/auth-shell";
 import { AuthSwitch } from "@/components/auth/auth-switch";
 import { VerifyEmailForm } from "@/components/auth/verify-email-form";
 
-export const metadata: Metadata = { title: "Verify your email · Life Replay" };
+export const metadata: Metadata = {
+  title: "Verify your email",
+  description: "Confirm your email address to continue to your Life Replay archive.",
+};
 
 export default async function VerifyEmailPage({
   searchParams,

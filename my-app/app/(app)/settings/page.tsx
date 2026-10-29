@@ -5,7 +5,10 @@ import { SettingsContent } from "@/components/profile/settings-content";
 import { getSession } from "@/features/auth/session";
 import { getProfileData } from "@/features/profile/queries";
 
-export const metadata: Metadata = { title: "Settings · Life Replay" };
+export const metadata: Metadata = {
+  title: "Settings",
+  description: "Adjust your Life Replay appearance, privacy, and notification settings.",
+};
 
 export default async function SettingsPage() {
   const session = await getSession();

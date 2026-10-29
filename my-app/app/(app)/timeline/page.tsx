@@ -21,7 +21,10 @@ import {
 } from "@/features/timeline/queries";
 import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Timeline" };
+export const metadata: Metadata = {
+  title: "Timeline",
+  description: "Browse your saved moments in chronological order.",
+};
 
 type TimelinePageProps = {
   searchParams: Promise<RawSearchParams>;

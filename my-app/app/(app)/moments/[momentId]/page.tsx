@@ -3,6 +3,7 @@ import Link from "next/link";
 import { and, desc, eq, ne } from "drizzle-orm";
 import { Pencil } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
+import { getOwnedMoment } from "@/features/moments/browse-queries";
 import { CategoryBadge } from "@/components/moments/category-badge";
 import { categoryMeta } from "@/components/moments/category";
 import { DeleteMomentButton } from "@/components/moments/delete-moment-button";
@@ -13,12 +14,44 @@ import { db } from "@/app/lib/db";
 import { getSessionUserId } from "@/features/auth/session";
 import { z } from "zod";
 
-export const metadata: Metadata = { title: "Moment" };
-
 type MomentPageProps = {
   params: Promise<{ momentId: string }>;
 };
 
+export async function generateMetadata({
+  params,
+}: MomentPageProps): Promise<Metadata> {
+  const { momentId } = await params;
+  if (!z.uuid().safeParse(momentId).success) {
+    return {
+      title: "Moment",
+      description: "A saved memory in your private Life Replay archive.",
+    };
+  }
+
+  const userId = await getSessionUserId();
+  if (!userId) {
+    return {
+      title: "Moment",
+      description: "A saved memory in your private Life Replay archive.",
+    };
+  }
+
+  const entry = await getOwnedMoment(userId, momentId);
+  if (!entry) {
+    return {
+      title: "Moment",
+      description: "A saved memory in your private Life Replay archive.",
+    };
+  }
+
+  return {
+    title: entry.title,
+    description:
+      entry.description?.trim().slice(0, 160) ||
+      `A saved ${entry.category.toLowerCase()} memory in your private archive.`,
+  };
+}
 
 export default async function MomentPage({ params }: MomentPageProps) {
   const userId = await getSessionUserId();
@@ -27,12 +60,7 @@ export default async function MomentPage({ params }: MomentPageProps) {
   const { momentId } = await params;
   if (!z.uuid().safeParse(momentId).success) notFound();
 
-  const [entry] = await db
-    .select()
-    .from(moment)
-    .where(and(eq(moment.id, momentId), eq(moment.userId, userId)))
-    .limit(1);
-
+  const entry = await getOwnedMoment(userId, momentId);
   if (!entry) notFound();
 
   const relatedMoments = await db

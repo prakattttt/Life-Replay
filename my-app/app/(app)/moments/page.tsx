@@ -5,7 +5,10 @@ import { getSessionUserId } from "@/features/auth/session";
 import { parseMomentBrowseParams, type RawMomentBrowseParams } from "@/features/moments/browse-params";
 import { getMomentArchive } from "@/features/moments/browse-queries";
 
-export const metadata: Metadata = { title: "Moments Archive" };
+export const metadata: Metadata = {
+  title: "Moments",
+  description: "Browse and rediscover the moments saved in your private archive.",
+};
 
 export default async function MomentsArchivePage({
   searchParams,

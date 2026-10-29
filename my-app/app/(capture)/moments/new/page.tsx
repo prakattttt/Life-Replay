@@ -3,7 +3,10 @@ import { connection } from "next/server";
 import { CaptureForm } from "@/components/moments/capture-form";
 import { getPromptOfTheDay } from "@/features/home/greeting";
 
-export const metadata: Metadata = { title: "New moment" };
+export const metadata: Metadata = {
+  title: "Capture a moment",
+  description: "Save a small moment to revisit in your Life Replay archive.",
+};
 
 export default async function NewMomentPage() {
   // The daily prompt depends on today's date, so render per request instead of

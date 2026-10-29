@@ -4,7 +4,10 @@ import { OnThisDayContent } from "@/components/dashboard/on-this-day-content";
 import { getSessionUserId } from "@/features/auth/session";
 import { getOnThisDayMoments } from "@/features/home/queries";
 
-export const metadata: Metadata = { title: "On This Day" };
+export const metadata: Metadata = {
+  title: "On this day",
+  description: "Revisit memories you saved on this calendar date in earlier years.",
+};
 
 export default async function OnThisDayPage() {
   const userId = await getSessionUserId();

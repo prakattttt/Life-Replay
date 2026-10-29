@@ -4,7 +4,10 @@ import { getSession } from "@/features/auth/session";
 import { getHomeData } from "@/features/home/queries";
 import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Home" };
+export const metadata: Metadata = {
+  title: "Your archive",
+  description: "Return to recent moments and memories from your personal archive.",
+};
 
 export default async function DashboardPage() {
   const now = new Date();

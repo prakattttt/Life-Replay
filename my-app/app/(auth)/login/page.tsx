@@ -3,7 +3,10 @@ import { AuthHeading } from "@/components/auth/auth-heading";
 import { AuthSwitch } from "@/components/auth/auth-switch";
 import { LoginForm } from "@/components/auth/login-form";
 
-export const metadata: Metadata = { title: "Sign in · Life Replay" };
+export const metadata: Metadata = {
+  title: "Sign in",
+  description: "Sign in to revisit your personal Life Replay archive.",
+};
 
 export default function LoginPage() {
   return (

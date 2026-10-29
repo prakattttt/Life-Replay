@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { and, count, desc, eq, sql } from "drizzle-orm";
 import { moment } from "@/app/db/schema";
 import { db } from "@/app/lib/db";
@@ -20,6 +21,16 @@ export type MomentBrowseResult = {
   total: number;
   page: number;
 };
+
+export const getOwnedMoment = cache(async (userId: string, momentId: string) => {
+  const [entry] = await db
+    .select()
+    .from(moment)
+    .where(and(eq(moment.id, momentId), eq(moment.userId, userId)))
+    .limit(1);
+
+  return entry ?? null;
+});
 
 export async function getMomentArchive(
   userId: string,

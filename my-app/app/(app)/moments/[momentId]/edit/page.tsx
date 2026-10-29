@@ -1,32 +1,51 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { and, eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
+import { getOwnedMoment } from "@/features/moments/browse-queries";
 import { MomentEditForm } from "@/components/moments/moment-edit-form";
-import { moment } from "@/app/db/schema";
-import { db } from "@/app/lib/db";
 import { getSessionUserId } from "@/features/auth/session";
 import { z } from "zod";
 
-export const metadata: Metadata = { title: "Edit moment" };
+type EditMomentPageProps = {
+  params: Promise<{ momentId: string }>;
+};
+
+export async function generateMetadata({
+  params,
+}: EditMomentPageProps): Promise<Metadata> {
+  const { momentId } = await params;
+  if (!z.uuid().safeParse(momentId).success) {
+    return {
+      title: "Edit moment",
+      description: "Update a moment in your private Life Replay archive.",
+    };
+  }
+
+  const userId = await getSessionUserId();
+  if (!userId) {
+    return {
+      title: "Edit moment",
+      description: "Update a moment in your private Life Replay archive.",
+    };
+  }
+
+  const entry = await getOwnedMoment(userId, momentId);
+  return {
+    title: entry ? `Edit ${entry.title}` : "Edit moment",
+    description: "Update a moment in your private Life Replay archive.",
+  };
+}
 
 export default async function EditMomentPage({
   params,
-}: {
-  params: Promise<{ momentId: string }>;
-}) {
+}: EditMomentPageProps) {
   const userId = await getSessionUserId();
   if (!userId) redirect("/login");
 
   const { momentId } = await params;
   if (!z.uuid().safeParse(momentId).success) notFound();
 
-  const [entry] = await db
-    .select()
-    .from(moment)
-    .where(and(eq(moment.id, momentId), eq(moment.userId, userId)))
-    .limit(1);
-
+  const entry = await getOwnedMoment(userId, momentId);
   if (!entry) notFound();
 
   return (

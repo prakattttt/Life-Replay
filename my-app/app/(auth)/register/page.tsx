@@ -3,7 +3,10 @@ import { AuthHeading } from "@/components/auth/auth-heading";
 import { AuthSwitch } from "@/components/auth/auth-switch";
 import { RegisterForm } from "@/components/auth/register-form";
 
-export const metadata: Metadata = { title: "Create account · Life Replay" };
+export const metadata: Metadata = {
+  title: "Create an account",
+  description: "Create a private archive for the everyday moments you want to remember.",
+};
 
 export default function RegisterPage() {
   return (

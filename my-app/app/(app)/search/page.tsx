@@ -5,7 +5,10 @@ import { getSessionUserId } from "@/features/auth/session";
 import { parseMomentBrowseParams, type RawMomentBrowseParams } from "@/features/moments/browse-params";
 import { searchMoments } from "@/features/moments/browse-queries";
 
-export const metadata: Metadata = { title: "Search Memories" };
+export const metadata: Metadata = {
+  title: "Search memories",
+  description: "Find moments in your private Life Replay archive.",
+};
 
 export default async function SearchPage({
   searchParams,

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 
-export const metadata: Metadata = { title: "Reset password · Life Replay" };
+export const metadata: Metadata = {
+  title: "Reset password",
+  description: "Choose a new password for your Life Replay account.",
+};
 
 type ResetPasswordPageProps = {
   searchParams: Promise<{ token?: string | string[]; error?: string | string[] }>;
