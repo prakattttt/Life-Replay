@@ -8,6 +8,8 @@ html {
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  color-scheme: light;
+
   /* ---------- Backgrounds ---------- */
   --background: #faf9f6;
   --background-secondary: #f3f1eb;
@@ -81,6 +83,8 @@ html {
 }
 
 .dark {
+  color-scheme: dark;
+
   /* ---------- Backgrounds ---------- */
   --background: #151614;
   --background-secondary: #191b19;

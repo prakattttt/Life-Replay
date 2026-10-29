@@ -7,7 +7,7 @@ type AuthHeadingProps = {
 
 export function AuthHeading({ eyebrow, title, description }: AuthHeadingProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 mb-5 lg:mb-8">
       <p className="text-xs font-bold uppercase tracking-widest text-amber-dark">
         {eyebrow}
       </p>
