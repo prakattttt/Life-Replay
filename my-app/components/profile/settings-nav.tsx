@@ -1,4 +1,5 @@
 const sections = [
+  { id: "email-verification", label: "Email verification" },
   { id: "appearance", label: "Appearance" },
   // { id: "notifications", label: "Notifications" },
   { id: "privacy", label: "Privacy" },

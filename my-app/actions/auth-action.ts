@@ -158,10 +158,43 @@ export async function resendVerificationEmail(email: string): Promise<AuthResult
     };
   }
 
+  return sendVerificationEmailTo(parsed.data.email);
+}
+
+export async function sendCurrentUserVerificationEmail(): Promise<AuthResult> {
+  try {
+    const requestHeaders = await headers();
+    const session = await auth.api.getSession({ headers: requestHeaders });
+    if (!session) {
+      return {
+        ok: false,
+        message: "Your session has expired. Please sign in again.",
+      };
+    }
+
+    if (session.user.emailVerified) {
+      return { ok: false, message: "Your email address is already verified." };
+    }
+
+    return sendVerificationEmailTo(session.user.email);
+  } catch (error) {
+    console.error(
+      "Failed to send verification email for the current user",
+      error instanceof Error ? error.message : "Unknown email error",
+    );
+    return {
+      ok: false,
+      code: getErrorCode(error),
+      message: "We couldn’t send a verification email. Please try again.",
+    };
+  }
+}
+
+async function sendVerificationEmailTo(email: string): Promise<AuthResult> {
   try {
     await auth.api.sendVerificationEmail({
       body: {
-        email: parsed.data.email,
+        email,
         callbackURL: appUrl("/verify-email?verified=1"),
       },
     });
@@ -169,7 +202,7 @@ export async function resendVerificationEmail(email: string): Promise<AuthResult
     return { ok: true };
   } catch (error) {
     console.error(
-      "Failed to resend verification email",
+      "Failed to send verification email",
       error instanceof Error ? error.message : "Unknown email error",
     );
     return {

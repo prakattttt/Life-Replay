@@ -17,13 +17,11 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: true,
+    requireEmailVerification: false,
+
     sendResetPassword: async ({ user, url }) => {
-      const safeUrl = url
-        .replaceAll("&", "&amp;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;");
+      const safeUrl = escapeHtml(url);
+
       await sendEmail({
         to: user.email,
         subject: "Reset your Life Replay password",
@@ -37,14 +35,13 @@ export const auth = betterAuth({
     deleteUser: {
       enabled: true,
     },
+
     changeEmail: {
       enabled: true,
+
       sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
-        const safeUrl = url
-          .replaceAll("&", "&amp;")
-          .replaceAll('"', "&quot;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;");
+        const safeUrl = escapeHtml(url);
+
         await sendEmail({
           to: user.email,
           subject: "Confirm your Life Replay email change",
@@ -56,9 +53,11 @@ export const auth = betterAuth({
   },
 
   emailVerification: {
-    sendOnSignUp: true,
+    sendOnSignUp: false,
     autoSignInAfterVerification: true,
-    sendVerificationEmail
+    expiresIn: 60 * 60,
+
+    sendVerificationEmail,
   },
 
   plugins: [nextCookies()],
@@ -71,15 +70,26 @@ async function sendVerificationEmail({
   user: { email: string };
   url: string;
 }): Promise<void> {
-  const safeUrl = url
-    .replaceAll("&", "&amp;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
+  const safeUrl = escapeHtml(url);
+
   await sendEmail({
     to: user.email,
     subject: "Verify your Life Replay email",
     text: `Confirm your email address using this link:\n${url}`,
-    html: `Confirm your email address by <a href="${safeUrl}">verifying your email</a>.`,
+    html: `
+      <h2>Verify your email address</h2>
+      <p>Confirm your email address to secure your Life Replay account.</p>
+      <a href="${safeUrl}">Verify your email</a>
+      <p>This link expires in one hour.</p>
+    `,
   });
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll("'", "&#39;");
 }

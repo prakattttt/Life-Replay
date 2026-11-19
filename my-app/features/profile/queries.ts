@@ -7,6 +7,7 @@ type ProfileIdentity = {
   id: string;
   name: string;
   email: string;
+  emailVerified: boolean;
   image?: string | null;
   createdAt: Date;
 };
@@ -40,6 +41,7 @@ export async function getProfileData(identity: ProfileIdentity): Promise<Profile
     profile: {
       name: identity.name,
       email: identity.email,
+      emailVerified: identity.emailVerified,
       imageUrl: identity.image ?? null,
       createdAt: identity.createdAt,
       momentCount: momentTotal?.total ?? 0,

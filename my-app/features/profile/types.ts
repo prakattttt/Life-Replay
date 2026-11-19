@@ -11,6 +11,7 @@ export type NotificationTime = string;
 export type Profile = {
   name: string;
   email: string;
+  emailVerified: boolean;
   imageUrl: string | null;
   createdAt: Date;
   momentCount: number;

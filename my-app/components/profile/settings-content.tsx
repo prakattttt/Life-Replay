@@ -3,6 +3,7 @@
 import { AppearanceSettings } from "./appearance-settings";
 import { DataExport } from "./data-export";
 // import { NotificationSettings } from "./notification-settings";
+import { EmailVerificationSettings } from "./email-verification-settings";
 import { PrivacySettings } from "./privacy-settings";
 import { SectionCard } from "./section-card";
 import { SettingsNav } from "./settings-nav";
@@ -27,6 +28,17 @@ export function SettingsContent() {
         <SettingsNav />
 
         <div className="flex min-w-0 flex-col gap-6">
+          <SectionCard
+            id="email-verification"
+            title="Email verification"
+            description="Confirm the email address connected to your account."
+          >
+            <EmailVerificationSettings
+              email={data.profile.email}
+              emailVerified={data.profile.emailVerified}
+            />
+          </SectionCard>
+
           <SectionCard
             id="appearance"
             title="Appearance"
