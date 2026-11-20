@@ -16,6 +16,10 @@ jobs:
     name: Lint & Build
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ./my-app
+
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       SITE_URL: ${{ secrets.SITE_URL }}
@@ -42,6 +46,7 @@ jobs:
         with:
           node-version: 26
           cache: pnpm
+          cache-dependency-path: my-app/pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
